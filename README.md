@@ -10,3 +10,9 @@ uses whatsapp-web.js
 see .github/workflows/cii-whatsapp-client.yml
 
 runs on any changes in the whatsapp-client folder. packages to docker and deploys to our internal GHCR location. gets picked up and deployed via nomad for job deploys
+
+## ENV variables
+
+WEBSOCKET_URL - URL to hookup to rails actioncable URL ie `ws://app/cable`
+
+KAFKA_BROKER - kafka formatted URL string to talk to streams server - IE `stream:9092`
