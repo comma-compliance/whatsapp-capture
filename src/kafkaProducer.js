@@ -1,6 +1,6 @@
 const { Kafka } = require('kafkajs');
 
-const kafkaBroker = process.env.KAFKA_BROKER;
+const kafkaBroker = process.env.KAFKA_URL;
 
 // Kafka Producer Setup
 module.exports = function KafkaProducer() {

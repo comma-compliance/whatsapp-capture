@@ -13,6 +13,6 @@ runs on any changes in the whatsapp-client folder. packages to docker and deploy
 
 ## ENV variables
 
-WEBSOCKET_URL - URL to hookup to rails actioncable URL ie `ws://app/cable`
+WEBSOCKET_URL - URL to hookup to rails actioncable URL ie `ws://app:3000/cable`
 
-KAFKA_BROKER - kafka formatted URL string to talk to streams server - IE `stream:9092`
+KAFKA_URL - kafka formatted URL string to talk to streams server - IE `stream:9092`
