@@ -1,9 +1,29 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const KafkaProducer = require('./kafkaProducer');
 const qrcode = require('qrcode-terminal');
+const WebSocket = require('ws');
+
+// Get the WebSocket URL from the environment variable
+const WEBSOCKET_URL = process.env.WEBSOCKET_URL;
 
 // Initialize the Kafka Producer
 const producer = KafkaProducer();
+
+// Connect to the WebSocket server
+let ws;
+if (WEBSOCKET_URL) {
+    ws = new WebSocket(WEBSOCKET_URL);
+
+    ws.on('open', function open() {
+        console.log('Connected to WebSocket server:', WEBSOCKET_URL);
+    });
+
+    ws.on('error', function error(err) {
+        console.error('WebSocket connection error:', err);
+    });
+} else {
+    console.error('WEBSOCKET_URL is not defined');
+}
 
 // WhatsApp Client
 const client = new Client({
@@ -17,6 +37,14 @@ const client = new Client({
 client.on('qr', qr => {
     qrcode.generate(qr, { small: true });
     console.log('QR RECEIVED', qr);
+
+    // Send the QR code to the WebSocket server
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'whatsapp_qr', qr_code: qr }));
+        console.log('QR code sent to WebSocket server');
+    } else {
+        console.error('WebSocket is not open. Could not send QR code');
+    }
 });
 
 // When authenticated

@@ -1,0 +1,34 @@
+{
+  "name": "Node.js WhatsApp Web App",
+  "context": "..",
+  "dockerFile": "Dockerfile",
+  "remoteUser": "chrome",
+  "runArgs": [
+    "--init",
+    "--cap-add=SYS_ADMIN",
+    "--shm-size=1g"
+  ],
+  "appPort": [
+    "3000:3000"
+  ],
+  "postCreateCommand": "npm install",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "eamodio.gitlens",
+        "ms-vscode.vscode-typescript-next"
+      ]
+    }
+  },
+  "forwardPorts": [3000],
+  "mounts": [
+    "source=${localEnv:HOME}/.ssh,target=/home/chrome/.ssh,type=bind,consistency=cached"
+  ],
+  "containerEnv": {
+    "WEBSOCKET_URL": "wss://app/cable",  // Replace with actual URL
+    "KAFKA_BROKER": "stream:9092",                            // Replace with your Kafka broker
+    "NODE_ENV": "development"                                // Change to "production" for production environment
+  }
+}
