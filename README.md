@@ -7,7 +7,7 @@ uses whatsapp-web.js
 
 ## CI
 
-see .github/workflows/cii-whatsapp-client.yml
+see .github/workflows/ci-whatsapp-client.yml
 
 runs on any changes in the whatsapp-client folder. packages to docker and deploys to our internal GHCR location. gets picked up and deployed via nomad for job deploys
 
