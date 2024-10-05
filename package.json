@@ -1,8 +1,8 @@
 {
   "dependencies": {
+    "@rails/actioncable": "^7.2.100",
     "kafkajs": "^2.2.4",
     "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "^1.26.0",
-    "ws": "^8.18.0"
+    "whatsapp-web.js": "^1.26.0"
   }
 }
