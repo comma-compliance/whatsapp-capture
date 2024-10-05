@@ -24,7 +24,7 @@ const consumer = createCable(WEBSOCKET_URL, {
 console.log('Subscribing to the chat channel', WEBSOCKET_URL)
 const channel = new ChatChannel()
 consumer.subscribe(channel)
-await channel.ensureSubscribed()
+// await channel.ensureSubscribed()
 
 channel.on('connect', msg => console.log(`connected ${msg.name}: ${msg.text}`))
 channel.on('message', msg => console.log(`${msg.name}: ${msg.text}`))
