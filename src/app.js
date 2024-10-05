@@ -1,83 +1,83 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const KafkaProducer = require('./kafkaProducer');
 const qrcode = require('qrcode-terminal');
-const WebSocket = require('ws');
+const ActionCable = require('@rails/actioncable');
 
 // Get the WebSocket URL from the environment variable
 const WEBSOCKET_URL = process.env.WEBSOCKET_URL;
 
-// Initialize the Kafka Producer
+// Initialize the Kafka Producer 
 const producer = KafkaProducer();
 
-// Connect to the WebSocket server
-let ws;
-if (WEBSOCKET_URL) {
-    ws = new WebSocket(WEBSOCKET_URL);
+// Create ActionCable consumer
+const cable = ActionCable.createConsumer(WEBSOCKET_URL);
 
-    ws.on('open', function open() {
-        console.log('Connected to WebSocket server:', WEBSOCKET_URL);
-    });
+cable.connection.onerror = (error) => {
+  console.error('ActionCable connection error:', error);
+};
 
-    ws.on('error', function error(err) {
-        console.error('WebSocket connection error:', err);
-    });
-} else {
-    console.error('WEBSOCKET_URL is not defined');
-}
+// Subscribe to the channel
+const whatsappChannel = cable.subscriptions.create('WhatsappChannel', {
+  connected() {
+    console.log('Connected to ActionCable server:', WEBSOCKET_URL);
+  },
+  disconnected() {
+    console.log('Disconnected from ActionCable server');
+  },
+  received(data) {
+    console.log('Received data from ActionCable:', data);
+  }
+});
 
 // WhatsApp Client
 const client = new Client({
-    authStrategy: new LocalAuth(),
-    puppeteer: {
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-    }
+  authStrategy: new LocalAuth(),
+  puppeteer: {
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  }
 });
 
 // Generate and display QR code for authentication
-client.on('qr', qr => {
-    qrcode.generate(qr, { small: true });
-    console.log('QR RECEIVED', qr);
+client.on('qr', (qr) => {
+  qrcode.generate(qr, { small: true });
+  console.log('QR RECEIVED', qr);
 
-    // Send the QR code to the WebSocket server
-    if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ type: 'whatsapp_qr', qr_code: qr }));
-        console.log('QR code sent to WebSocket server');
-    } else {
-        console.error('WebSocket is not open. Could not send QR code');
-    }
+  // Send the QR code to the ActionCable server
+  whatsappChannel.send({ qr_code: qr });
+  console.log('QR code sent to ActionCable server');
 });
 
 // When authenticated
 client.on('authenticated', () => {
-    console.log('AUTHENTICATED');
+  console.log('AUTHENTICATED');
 });
 
 // Handle new messages
-client.on('message', async message => {
-    console.log('MESSAGE RECEIVED:', message.body);
+client.on('message', async (message) => {
+  console.log('MESSAGE RECEIVED:', message.body);
 
-    // Send the message to Kafka
-    producer.send({
-        topic: 'whatsapp-messages',
-        messages: [
-            { key: message.from, value: JSON.stringify(message) }
-        ],
-    }).catch(console.error);
+  // Send the message to Kafka
+  producer
+    .send({
+      topic: 'whatsapp-messages',
+      messages: [{ key: message.from, value: JSON.stringify(message) }]
+    })
+    .catch(console.error);
 });
 
 // Handle contacts
 client.on('ready', async () => {
-    console.log('Client is ready!');
-    const contacts = await client.getContacts();
+  console.log('Client is ready!');
+  const contacts = await client.getContacts();
 
-    contacts.forEach(contact => {
-        producer.send({
-            topic: 'whatsapp-contacts',
-            messages: [
-                { key: contact.id._serialized, value: JSON.stringify(contact) }
-            ],
-        }).catch(console.error);
-    });
+  contacts.forEach((contact) => {
+    producer
+      .send({
+        topic: 'whatsapp-contacts',
+        messages: [{ key: contact.id._serialized, value: JSON.stringify(contact) }]
+      })
+      .catch(console.error);
+  });
 });
 
 client.initialize();
