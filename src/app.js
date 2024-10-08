@@ -50,6 +50,7 @@ client.on('qr', (qr) => {
 // When authenticated
 client.on('authenticated', () => {
   console.log('AUTHENTICATED');
+  channel.speak({message: "AUTHENTICATED"});
 });
 
 // Handle new messages
@@ -68,6 +69,7 @@ client.on('message', async (message) => {
 // Handle contacts
 client.on('ready', async () => {
   console.log('Client is ready!');
+  channel.speak({message: "client is ready!"})
   const contacts = await client.getContacts();
 
   contacts.forEach((contact) => {
@@ -80,4 +82,8 @@ client.on('ready', async () => {
   });
 });
 
-client.initialize();
+const run = async () => {
+  client.initialize();
+}
+
+run().catch(console.error)
