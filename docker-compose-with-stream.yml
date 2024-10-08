@@ -1,0 +1,50 @@
+services:
+  whatsapp:
+    build: .
+    container_name: whatsapp
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=development
+      - KAFKA_URL=stream:9092
+      - WEBSOCKET_URL=ws://tcc-rails-app-1:3000/cable?token=this_should_never_be_in_prod
+    volumes:
+      - ./session.json:/usr/src/app/session.json
+    depends_on:
+      - stream
+    networks:
+      - app_network
+    ports:
+      - "3333:3333" # this isn't needed, make it anything th
+  stream:
+    command:
+      - redpanda
+      - start
+      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr internal://stream:9092,external://localhost:19092
+      - --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:18082
+      - --advertise-pandaproxy-addr internal://stream:8082,external://localhost:18082
+      - --schema-registry-addr internal://0.0.0.0:8081,external://0.0.0.0:18081
+      - --rpc-addr stream:33145
+      - --advertise-rpc-addr stream:33145
+      - --mode dev-container
+      - --smp 1
+      - --default-log-level=info
+    image: docker.redpanda.com/redpandadata/redpanda:v24.2.5
+    container_name: stream
+    volumes:
+      - stream-data:/var/lib/redpanda/data
+    networks:
+    - default
+    ports:
+      - 18081:18081
+      - 18082:18082
+      - 9092:9092
+      - 19092:19092
+      - 19644:9644
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  stream-data:

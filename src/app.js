@@ -1,5 +1,4 @@
 // app.js
-
 import pkg from 'whatsapp-web.js';
 const { Client, LocalAuth } = pkg;
 
@@ -10,7 +9,7 @@ import ChatChannel from './channels/chat.js'
 import WebSocket from 'ws';
 
 // Get the WebSocket URL from the environment variable
-const WEBSOCKET_URL = process.env.WEBSOCKET_URL || 'ws://rails-app:3000/cable?token=this_should_never_be_in_prod';
+const WEBSOCKET_URL = process.env.WEBSOCKET_URL || 'ws://tcc-rails-app-1:3000/cable?token=this_should_never_be_in_prod';
 
 // Initialize the Kafka Producer
 const producer = KafkaProducer();
@@ -62,6 +61,7 @@ client.on('qr', (qr) => {
 // When authenticated
 client.on('authenticated', () => {
   console.log('AUTHENTICATED');
+  channel.speak({message: "AUTHENTICATED"});
 });
 
 // Handle new messages
@@ -80,6 +80,7 @@ client.on('message', async (message) => {
 // Handle contacts
 client.on('ready', async () => {
   console.log('Client is ready!');
+  channel.speak({message: "client is ready!"})
   const contacts = await client.getContacts();
 
   contacts.forEach((contact) => {
@@ -94,4 +95,8 @@ client.on('ready', async () => {
   });
 });
 
-client.initialize();
+const run = async () => {
+  client.initialize();
+}
+
+run().catch(console.error)
