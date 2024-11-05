@@ -5,7 +5,7 @@ const { Client, LocalAuth } = pkg;
 import qrcode from 'qrcode-terminal';
 import fetch from 'node-fetch';
 
-const WEBHOOK_URL = 'http://10.10.69.111:3000/webhooks/incoming/whatsapp_webhooks/';
+const WEBHOOK_URL = process.env.WEBHOOK_URL || 'http://100.95.55.44:3000/webhooks/incoming/whatsapp_webhooks/';
 
 // WhatsApp Client
 const client = new Client({
