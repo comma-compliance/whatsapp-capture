@@ -17,6 +17,12 @@ WEBSOCKET_URL - URL to hookup to rails actioncable URL ie `ws://app:3000/cable?t
 
 KAFKA_URL - kafka formatted URL string to talk to streams server - IE `stream:9092`
 
+SENTRY_DSN - sentry DSN url if you want sentry logging
+
+*if* you're using webhook.js
+
+WEBHOOK_URL - url to hookup to rails inbound webhook URL ie `http://app:3000/webhooks/incoming/whatsapp_webhooks/`
+
 ## Local dev
 
 have to build the docker because we need the chrome & puppeteer elements that aren't usually available locally.

@@ -10,6 +10,9 @@ USER chrome
 COPY --chown=chrome:chrome package*.json ./
 RUN npm install
 
+# Run the Sentry wizard to set up source maps
+RUN npx @sentry/wizard@latest -i sourcemaps --saas
+
 # Copy the source code
 COPY ./src ./
 

@@ -1,4 +1,5 @@
-// app.js
+// webhook.js
+import './sentry'
 import pkg from 'whatsapp-web.js';
 const { Client, LocalAuth } = pkg;
 
@@ -109,4 +110,4 @@ const run = async () => {
   client.initialize();
 };
 
-run().catch(console.error);
+run().catch((e) => Sentry.captureException(e));
