@@ -1,5 +1,5 @@
 // webhook.js
-import './sentry'
+import './sentry.js'
 import pkg from 'whatsapp-web.js';
 const { Client, LocalAuth } = pkg;
 

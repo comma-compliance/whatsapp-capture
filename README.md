@@ -19,7 +19,9 @@ KAFKA_URL - kafka formatted URL string to talk to streams server - IE `stream:90
 
 SENTRY_DSN - sentry DSN url if you want sentry logging
 
-*if* you're using webhook.js
+PORT defaults to 3000
+
+*if* you're using webhook
 
 WEBHOOK_URL - url to hookup to rails inbound webhook URL ie `http://app:3000/webhooks/incoming/whatsapp_webhooks/`
 
@@ -32,3 +34,9 @@ have to build the docker because we need the chrome & puppeteer elements that ar
 `docker compose -f docker-compose-with-stream.yml up` if you aren't already running a stream/kafka listener
 
 `docker exec -it whatsapp sh` to get a shell
+
+## local docker build/run
+
+`docker build --tag whatsapp-client .`
+
+`docker run -e WEBHOOK_URL="ws://100.100.69.111:3000/cable?token=this_should_never_be_in_prod" -e WEBSOCKET_URL="ws://100.100.69.111:3000/cable?token=this_should_never_be_in_prod" whatsapp-client:latest`

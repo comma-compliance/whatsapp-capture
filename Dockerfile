@@ -11,13 +11,13 @@ COPY --chown=chrome:chrome package*.json ./
 RUN npm install
 
 # Run the Sentry wizard to set up source maps
-RUN npx @sentry/wizard@latest -i sourcemaps --saas
+RUN if [ -n "$SENTRY_ENV" ]; then npx @sentry/wizard@latest -i sourcemaps --saas; fi
 
 # Copy the source code
 COPY ./src ./
 
 # Expose the necessary port
-EXPOSE 3000
+EXPOSE ${PORT:-3000}
 
 # Start the application
-CMD ["node", "webhook.js"]
+CMD ["node", "app.js"]
