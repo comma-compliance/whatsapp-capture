@@ -1,21 +1,21 @@
-const { Kafka } = require('kafkajs');
+import { Kafka } from 'kafkajs'
 
-const kafkaBroker = process.env.KAFKA_URL;
+const kafkaBroker = process.env.KAFKA_URL
 
 // Kafka Producer Setup
-module.exports = function KafkaProducer() {
-    const kafka = new Kafka({
-        clientId: 'whatsapp-producer',
-        brokers: [kafkaBroker]
-    });
+export default function KafkaProducer () {
+  const kafka = new Kafka({
+    clientId: 'whatsapp-producer',
+    brokers: [kafkaBroker]
+  })
 
-    const producer = kafka.producer();
-    const runProducer = async () => {
-        await producer.connect();
-        console.log('Kafka Producer connected!');
-    };
+  const producer = kafka.producer()
+  const runProducer = async () => {
+    await producer.connect()
+    console.log('Kafka Producer connected!')
+  }
 
-    runProducer().catch(console.error);
+  runProducer().catch(console.error)
 
-    return producer;
+  return producer
 };
