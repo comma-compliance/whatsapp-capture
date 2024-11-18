@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "node src/app.js"
+    "start": "node src/app.js",
+    "lint": "standard --fix"
   },
   "dependencies": {
     "@anycable/core": "^0.9.1",
@@ -12,6 +13,7 @@
     "@sentry/profiling-node": "^8.38.0",
     "kafkajs": "^2.2.4",
     "qrcode-terminal": "^0.12.0",
+    "uuid": "^11.0.3",
     "whatsapp-web.js": "^1.26.0",
     "ws": "^8.18.0",
     "wwebjs-aws-s3": "^1.0.2"

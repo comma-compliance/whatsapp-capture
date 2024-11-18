@@ -4,6 +4,9 @@ FROM zenika/alpine-chrome:with-puppeteer
 # Set the working directory inside the container
 WORKDIR /usr/src/app
 
+USER root 
+RUN mkdir -p /data /data/session
+
 USER chrome
 
 # Copy package.json and install dependencies
@@ -19,5 +22,9 @@ COPY ./src ./
 # Expose the necessary port
 EXPOSE ${PORT:-3000}
 
+USER root
+RUN chown -R chrome:chrome /data
+USER chrome
+
 # Start the application
-CMD ["node", "app.js"]
+CMD ["node", "index.js"]
