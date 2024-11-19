@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "node src/app.js",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest",
     "lint": "standard --fix"
   },
   "dependencies": {
@@ -19,6 +20,12 @@
     "wwebjs-aws-s3": "^1.0.2"
   },
   "devDependencies": {
+    "jest": "^29.7.0",
     "standard": "^17.1.2"
+  },
+  "standard": {
+    "env": [
+      "jest"
+    ]
   }
 }
