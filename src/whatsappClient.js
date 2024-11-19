@@ -7,6 +7,8 @@ import { channel } from './anycable.js'
 import { setLatestQRCode } from './state.js'
 import { sendWebhook } from './helpers.js'
 
+let clientInstance = null
+
 export function initializeWhatsAppClient () {
   const authStrategy = getAuthStrategy()
 
@@ -16,6 +18,8 @@ export function initializeWhatsAppClient () {
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     }
   })
+
+  clientInstance = client
 
   // Generate and display QR code for authentication
   client.on('qr', (qr) => {
@@ -71,4 +75,20 @@ export function initializeWhatsAppClient () {
   })
 
   return client
+}
+
+export function stopWhatsAppClient () {
+  if (clientInstance) {
+    clientInstance
+      .destroy()
+      .then(() => {
+        console.log('WhatsApp client has been stopped.')
+        channel.speak({ message: 'WhatsApp client has been stopped.' })
+      })
+      .catch((err) => {
+        console.error('Error stopping WhatsApp client:', err)
+      })
+  } else {
+    console.log('No WhatsApp client instance to stop.')
+  }
 }
