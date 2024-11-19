@@ -31,7 +31,7 @@ export function initializeWhatsAppClient () {
   // When authenticated
   client.on('authenticated', () => {
     console.log('AUTHENTICATED')
-    channel.speak({ whatsapp_authed: true }) // TODO: pass phone number/account details
+    channel.speak({ whatsapp_authed: true }) // TODO: pass phone number/account details of the authenticated account
   })
 
   client.on('remote_session_saved', () => {
@@ -41,7 +41,7 @@ export function initializeWhatsAppClient () {
 
   // Handle new messages
   client.on('message', async (message) => {
-    console.log('MESSAGE RECEIVED:', message.body)
+    console.log('MESSAGE RECEIVED:', message.body) // https://docs.wwebjs.dev/Message.html
 
     // Send the message to the webhook URL
     const data = {
@@ -57,8 +57,9 @@ export function initializeWhatsAppClient () {
     console.log('Client is ready!')
     channel.speak({ message: 'Client is ready!' })
 
-    const contacts = await client.getContacts()
+    const contacts = await client.getContacts() // https://docs.wwebjs.dev/Contact.html
 
+    // get the avatar pic and include in payload - getProfilePicUrl()
     contacts.forEach((contact) => {
       const data = {
         key: contact.id._serialized,

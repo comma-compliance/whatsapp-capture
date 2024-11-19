@@ -1,6 +1,6 @@
 import { uuidv4 } from './helpers.js'
 
-export const JOB_ID = process.env.NOMAD_JOB_ID || uuidv4()
+export const JOB_ID = process.env.NOMAD_JOB_ID || process.env.JOB_ID || uuidv4()
 
 export const WEBSOCKET_URL = process.env.WEBSOCKET_URL || 'ws://tcc-rails-app-1:3000/cable?token=this_should_never_be_in_prod'
 
