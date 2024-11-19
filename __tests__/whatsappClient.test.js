@@ -19,6 +19,7 @@ jest.mock('whatsapp-web.js', () => {
 
 // Mock the AnyCable channel
 jest.mock('../src/anycable', () => ({
+  __esModule: true,
   channel: {
     speak: jest.fn()
   }
