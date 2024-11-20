@@ -5,7 +5,7 @@ export default class ChatChannel extends Channel {
   static identifier = 'WhatsappChannel'
 
   async speak (message) {
-    return this.perform('speak', { message })
+    return this.perform('speak', message)
   }
 
   receive (message) {
