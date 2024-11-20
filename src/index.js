@@ -11,6 +11,7 @@ const client = initializeWhatsAppClient()
 
 // Run the client
 const run = async () => {
+  console.log('Initializing WhatsApp client')
   client.initialize()
 }
 

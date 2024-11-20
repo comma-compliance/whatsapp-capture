@@ -16,10 +16,10 @@ export const channel = new ChatChannel({ room_id: JOB_ID })
 consumer.subscribe(channel)
 
 // Event handlers for AnyCable
-channel.on('connect', (msg) => console.log(`Connected ${msg.name}: ${msg.text}`))
+channel.on('connect', (msg) => console.log(`Connected to anycable ${JSON.stringify(msg)}`))
 
 channel.on('message', (msg) => {
-  console.log('MESSAGE RECEIVED:', msg)
+  console.log('MESSAGE RECEIVED:', JSON.stringify(msg))
   const data = typeof msg === 'string' ? JSON.parse(msg) : msg
 
   if (data.type === 'disconnect') {
@@ -34,9 +34,9 @@ channel.on('message', (msg) => {
   }
 })
 
-channel.on('typing', (msg) => console.log(`User ${msg.name} is typing`))
-channel.on('close', () => console.log('Disconnected from WebSocket server'))
-channel.on('disconnect', () => console.log('No WebSocket connection'))
+channel.on('typing', (msg) => console.log(`User ${JSON.stringify(msg)} is typing`))
+channel.on('close', () => console.log('close from WebSocket server'))
+channel.on('disconnect', () => console.log('disconnect from WebSocket connection'))
 
 // Connect the consumer
 consumer.connect()
