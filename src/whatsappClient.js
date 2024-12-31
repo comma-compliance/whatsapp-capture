@@ -35,7 +35,6 @@ export function initializeWhatsAppClient () {
   // When authenticated
   client.on('authenticated', () => {
     console.log('AUTHENTICATED')
-    channel.speak({ whatsapp_authed: true }) // TODO: pass phone number/account details of the authenticated account
   })
 
   client.on('remote_session_saved', () => {
@@ -58,6 +57,8 @@ export function initializeWhatsAppClient () {
 
   // Handle contacts
   client.on('ready', async () => {
+    console.log('Client info:', client.info)
+    channel.speak({ whatsapp_authed: true, user_identifier: client.info.me.user })
     console.log('Client is ready!')
     channel.speak({ message: 'Client is ready!' })
 
