@@ -43,7 +43,7 @@ export function initializeWhatsAppClient () {
   })
 
   // Handle new messages
-  client.on('message', async (message) => {
+  client.on('message_create', async (message) => {
     console.log('MESSAGE RECEIVED:', message.body) // https://docs.wwebjs.dev/Message.html
 
     // Send the message to the webhook URL
