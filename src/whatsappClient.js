@@ -59,7 +59,8 @@ export function initializeWhatsAppClient () {
   client.on('ready', async () => {
     const info = client.info
     console.log('Client info:', client.info)
-    channel.speak({ whatsapp_authed: true, user_info: { platform_unique_id: info.me.user, name: info.pushname, phone: info.me.user }})
+    const userInfo = { platform_unique_id: info.me.user, name: info.pushname, phone: info.me.user, business: false }
+    channel.speak({ whatsapp_authed: true, user_info: userInfo})
     console.log('Client is ready!')
     channel.speak({ message: 'Client is ready!' })
 
