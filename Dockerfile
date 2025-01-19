@@ -1,5 +1,5 @@
 # largely borrowed from https://github.com/pedroslopez/whatsapp-web.js/issues/2542
-FROM zenika/alpine-chrome:with-puppeteer as base
+FROM zenika/alpine-chrome:with-puppeteer AS base
 
 # Set the working directory inside the container
 WORKDIR /usr/src/app

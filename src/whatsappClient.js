@@ -99,13 +99,11 @@ export function stopWhatsAppClient () {
 // phoneNumber WITH COUNTRY CODE
 export async function sendMessage (phoneNumber, message) {
   if (clientInstance) {
-    clientInstance.sendMessage(phone, message)
-
     const sanitized_number = phoneNumber.toString().replace(/[- )(]/g, ""); // remove unnecessary chars from the number
-    const number_details = await client.getNumberId(sanitized_number); // get mobile number details from whatsapp
+    const number_details = await clientInstance.getNumberId(sanitized_number); // get mobile number details from whatsapp
     
     if (number_details) {
-        const sendMessageData = await client.sendMessage(number_details._serialized, message); // send message
+        const sendMessageData = await clientInstance.sendMessage(number_details._serialized, message); // send message
         return sendMessageData;
     } else {
         console.log(final_number, "Mobile number is not registered");
