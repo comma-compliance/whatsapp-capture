@@ -86,9 +86,10 @@ export function stopWhatsAppClient () {
       .destroy()
       .then(() => {
         console.log('WhatsApp client has been stopped.')
-        channel.speak({ message: 'WhatsApp client has been stopped.' })
+        channel.send({ message: 'WhatsApp client has been stopped.', type: 'disconnected' })
       })
       .catch((err) => {
+        channel.send({ type: 'failed' })
         console.error('Error stopping WhatsApp client:', err)
       })
   } else {
