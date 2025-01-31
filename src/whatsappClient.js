@@ -44,13 +44,23 @@ export function initializeWhatsAppClient () {
 
   // Handle new messages
   client.on('message_create', async (message) => {
+    let mediaData = null;
+
+    if (message.hasMedia) {
+      const media = await message.downloadMedia();
+      mediaData = `data:${media.mimetype};base64,${media.data}`;
+    }
+
     console.log('MESSAGE RECEIVED:', message.body) // https://docs.wwebjs.dev/Message.html
 
     // Send the message to the webhook URL
     const data = {
       key: message.from,
-      message
-    }
+      message: {
+          ...message,
+          mediaData: mediaData
+      }
+  };
 
     sendWebhook(data)
   })
@@ -59,7 +69,8 @@ export function initializeWhatsAppClient () {
   client.on('ready', async () => {
     const info = client.info
     console.log('Client info:', client.info)
-    const userInfo = { sender_identifier: info.me.user, sender_name: info.pushname, phone: info.me.user, business: false }
+    const profilePicUrl = await client.getProfilePicUrl(info.me._serialized);
+    const userInfo = { sender_identifier: info.me.user, sender_name: info.pushname, phone: info.me.user, business: false, avatar: profilePicUrl }
     channel.speak({ whatsapp_authed: true, user_info: userInfo})
     console.log('Client is ready!')
     channel.speak({ message: 'Client is ready!' })
@@ -67,9 +78,11 @@ export function initializeWhatsAppClient () {
     const contacts = await client.getContacts() // https://docs.wwebjs.dev/Contact.html
 
     // get the avatar pic and include in payload - getProfilePicUrl()
-    contacts.forEach((contact) => {
+    contacts.forEach(async (contact) => {
+      const avatar = await client.getProfilePicUrl(contact.id._serialized)
       const data = {
         key: contact.id._serialized,
+        avatar,
         contact
       }
 
