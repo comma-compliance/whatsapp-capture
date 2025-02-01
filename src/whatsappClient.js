@@ -69,9 +69,8 @@ export function initializeWhatsAppClient () {
   client.on('ready', async () => {
     const info = client.info
     console.log('Client info:', client.info)
-    const profilePicUrl = await client.getProfilePicUrl(info.me._serialized);
-    const userInfo = { sender_identifier: info.me.user, sender_name: info.pushname, phone: info.me.user, business: false, avatar: profilePicUrl }
-    channel.speak({ whatsapp_authed: true, user_info: userInfo})
+    const userInfo = { sender_identifier: info.me.user, sender_name: info.pushname, phone: info.me.user, business: false }
+    channel.speak({ whatsapp_authed: true, user_info: userInfo })
     console.log('Client is ready!')
     channel.speak({ message: 'Client is ready!' })
 
@@ -113,16 +112,15 @@ export function stopWhatsAppClient () {
 // phoneNumber WITH COUNTRY CODE
 export async function sendMessage (phoneNumber, message) {
   if (clientInstance) {
-    const sanitized_number = phoneNumber.toString().replace(/[- )(]/g, ""); // remove unnecessary chars from the number
-    const number_details = await clientInstance.getNumberId(sanitized_number); // get mobile number details from whatsapp
-    
-    if (number_details) {
-        const sendMessageData = await clientInstance.sendMessage(number_details._serialized, message); // send message
-        return sendMessageData;
-    } else {
-        console.log(final_number, "Mobile number is not registered");
-    }
+    const sanitizedNumber = phoneNumber.toString().replace(/[- )(]/g, '') // remove unnecessary chars from the number
+    const numberDetails = await clientInstance.getNumberId(sanitizedNumber) // get mobile number details from whatsapp
 
+    if (numberDetails) {
+      const sendMessageData = await clientInstance.sendMessage(numberDetails._serialized, message) // send message
+      return sendMessageData
+    } else {
+      console.log(sanitizedNumber, 'Mobile number is not registered')
+    }
   } else {
     console.log('No WhatsApp client instance to send message.')
   }

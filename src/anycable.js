@@ -33,7 +33,7 @@ channel.on('message', async (msg) => {
     // send the message via whatsapp to the specified phone number
     console.log('Sending message:', data.message, 'to', data.phone_number)
     const resp = await sendMessage(data.phone_number, data.message)
-    
+
     channel.speak({ message_sent: true, response: resp })
   } else {
     console.log(`${data.name || 'Server'}: ${data.text || JSON.stringify(data)}`)
