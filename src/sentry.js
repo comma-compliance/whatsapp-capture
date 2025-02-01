@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/node'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
+require('log-timestamp')
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
