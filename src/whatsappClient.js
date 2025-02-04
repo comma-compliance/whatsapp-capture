@@ -38,6 +38,11 @@ export function initializeWhatsAppClient () {
     console.log('AUTHENTICATED')
   })
 
+  // When disconnected
+  client.on('disconnected', () => {
+    console.log('DISCONNECTED')
+  })
+
   client.on('remote_session_saved', () => {
     console.log('Remote session saved')
     channel.speak({ message: 'Remote session saved' })
