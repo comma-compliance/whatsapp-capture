@@ -6,6 +6,7 @@ import { getAuthStrategy } from './authStrategy.js'
 import { channel } from './anycable.js'
 import { setLatestQRCode } from './state.js'
 import { sendWebhook } from './helpers.js'
+require('log-timestamp')
 
 let clientInstance = null
 
