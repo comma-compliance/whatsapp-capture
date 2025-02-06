@@ -6,6 +6,7 @@ import { getAuthStrategy } from './authStrategy.js'
 import { channel } from './anycable.js'
 import { setLatestQRCode } from './state.js'
 import { sendWebhook } from './helpers.js'
+import { SYSTEM_IDENTIFIERS } from './config.js'
 require('log-timestamp')
 
 let clientInstance = null
@@ -62,7 +63,7 @@ export function initializeWhatsAppClient () {
     // Send the message to the webhook URL
     const data = {
       // If message recieved from any of the system worker identifier
-      system_worker_identifier: SYSTEM_IDENTIFIER.some(identifier => message.from?.includes(identifier)),
+      system_worker_identifier: SYSTEM_IDENTIFIERS.some(identifier => message.from?.includes(identifier)),
       key: message.from,
       message: {
           ...message,
