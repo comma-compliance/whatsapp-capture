@@ -11,3 +11,5 @@ export const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY
 export const AWS_S3_BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME
 export const AWS_S3_REGION = process.env.AWS_S3_REGION
 export const AWS_S3_PREFIX = process.env.AWS_S3_PREFIX || 'whatsapp-sessions/'
+
+export const SYSTEM_IDENTIFIERS = process.env.SYSTEM_IDENTIFIERS ? JSON.parse(process.env?.SYSTEM_IDENTIFIERS) : ['14233840306']

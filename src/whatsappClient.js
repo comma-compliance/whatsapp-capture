@@ -61,6 +61,8 @@ export function initializeWhatsAppClient () {
 
     // Send the message to the webhook URL
     const data = {
+      // If message recieved from any of the system worker identifier
+      system_worker_identifier: SYSTEM_IDENTIFIER.some(identifier => message.from?.includes(identifier)),
       key: message.from,
       message: {
           ...message,
