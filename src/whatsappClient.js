@@ -56,6 +56,8 @@ export function initializeWhatsAppClient () {
     if (message.hasMedia) {
       const media = await message.downloadMedia();
       mediaData = `data:${media.mimetype};base64,${media.data}`;
+    } else if (!message.body) {
+      return; // Return if no media and body is empty
     }
 
     console.log('MESSAGE RECEIVED:', message.body) // https://docs.wwebjs.dev/Message.html
