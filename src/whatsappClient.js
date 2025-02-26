@@ -89,7 +89,7 @@ export function initializeWhatsAppClient () {
     console.log(`Total contacts: ${contacts.length}`);
     await new Promise((resolve) => setTimeout(resolve, 5));
 
-    sendInBatches(contacts, 30, 5000);
+    sendInBatches(contacts, 30, 10000);
   })
 
   return client
