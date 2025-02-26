@@ -61,3 +61,21 @@ export function getAuthStrategy () {
     })
   }
 }
+
+export const browserArgs = [
+  '--disable-accelerated-2d-canvas', '--disable-background-timer-throttling',
+  '--disable-backgrounding-occluded-windows', '--disable-breakpad',
+  '--disable-cache', '--disable-component-extensions-with-background-pages',
+  '--disable-crash-reporter', '--disable-dev-shm-usage',
+  '--disable-extensions', '--disable-gpu',
+  '--disable-hang-monitor', '--disable-ipc-flooding-protection',
+  '--disable-mojo-local-storage', '--disable-notifications',
+  '--disable-popup-blocking', '--disable-print-preview',
+  '--disable-prompt-on-repost', '--disable-renderer-backgrounding',
+  '--disable-software-rasterizer', '--ignore-certificate-errors',
+  '--log-level=3', '--no-default-browser-check',
+  '--no-first-run', '--no-sandbox',
+  '--no-zygote', '--renderer-process-limit=100',
+  '--enable-gpu-rasterization', '--enable-zero-copy',
+  '--disable-setuid-sandbox'
+] // Found from channel here https://discord.com/channels/698610475432411196/1331949870457688136/1331969167607336960

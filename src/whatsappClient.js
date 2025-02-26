@@ -2,7 +2,7 @@
 
 import { Client } from 'whatsapp-web.js'
 import qrcode from 'qrcode-terminal'
-import { getAuthStrategy } from './authStrategy.js'
+import { getAuthStrategy, browserArgs } from './authStrategy.js'
 import { channel } from './anycable.js'
 import { setLatestQRCode } from './state.js'
 import { sendWebhook, sendContactsWebhook } from './helpers.js'
@@ -17,7 +17,7 @@ export function initializeWhatsAppClient () {
   const client = new Client({
     authStrategy,
     puppeteer: {
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: browserArgs
     }
   })
 
