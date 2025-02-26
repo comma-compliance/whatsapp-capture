@@ -87,8 +87,9 @@ export function initializeWhatsAppClient () {
 
     const contacts = await client.getContacts() // https://docs.wwebjs.dev/Contact.html
     console.log(`Total contacts: ${contacts.length}`);
+    await new Promise((resolve) => setTimeout(resolve, 5));
 
-    sendInBatches(contacts, 30, 10000);
+    sendInBatches(contacts, 30, 5000);
   })
 
   return client
@@ -103,6 +104,7 @@ async function sendInBatches(contacts, batchSize, delay) {
     const batchData = await Promise.all(
       batch.map(async (contact) => {
         const avatar = await clientInstance.getProfilePicUrl(contact.id._serialized);
+        await new Promise((resolve) => setTimeout(resolve, 0.5));
         return {
           contact: {
             data: {
