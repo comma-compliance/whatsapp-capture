@@ -2,11 +2,11 @@
 
 import { Client } from 'whatsapp-web.js'
 import qrcode from 'qrcode-terminal'
-import { getAuthStrategy, browserArgs } from './authStrategy.js'
+import { getAuthStrategy } from './authStrategy.js'
 import { channel } from './anycable.js'
 import { setLatestQRCode } from './state.js'
-import { sendWebhook, sendContactsWebhook } from './helpers.js'
-import { SYSTEM_IDENTIFIERS, JOB_ID } from './config.js'
+import { sendWebhook } from './helpers.js'
+import { SYSTEM_IDENTIFIERS } from './config.js'
 require('log-timestamp')
 
 let clientInstance = null
@@ -17,7 +17,7 @@ export function initializeWhatsAppClient () {
   const client = new Client({
     authStrategy,
     puppeteer: {
-      args: browserArgs
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
     }
   })
 
@@ -86,47 +86,21 @@ export function initializeWhatsAppClient () {
     channel.speak({ message: 'Client is ready!' })
 
     const contacts = await client.getContacts() // https://docs.wwebjs.dev/Contact.html
-    console.log(`Total contacts: ${contacts.length}`);
-    await new Promise((resolve) => setTimeout(resolve, 5));
 
-    sendInBatches(contacts, 30, 10000);
+    // get the avatar pic and include in payload - getProfilePicUrl()
+    contacts.forEach(async (contact) => {
+      const avatar = await client.getProfilePicUrl(contact.id._serialized)
+      const data = {
+        key: contact.id._serialized,
+        avatar,
+        contact
+      }
+
+      sendWebhook(data)
+    })
   })
 
   return client
-}
-
-async function sendInBatches(contacts, batchSize, delay) {
-  for (let i = 0; i < contacts.length; i += batchSize) {
-    const batch = contacts.slice(i, i + batchSize);
-    console.log(`Sent batch length ${batch.length}`);
-
-    // Fetch avatars for all contacts in the batch concurrently
-    const batchData = await Promise.all(
-      batch.map(async (contact) => {
-        const avatar = await clientInstance.getProfilePicUrl(contact.id._serialized);
-        await new Promise((resolve) => setTimeout(resolve, 0.5));
-        return {
-          contact: {
-            data: {
-              key: contact.id._serialized,
-              avatar,
-              contact
-            },
-            job_id: JOB_ID
-          }
-        };
-      })
-    );
-
-    // Send the batch as a single webhook request
-    sendContactsWebhook(batchData);
-
-    console.log(`Sent batch ${Math.floor(i / batchSize) + 1}`);
-
-    if (i + batchSize < contacts.length) {
-      await new Promise((resolve) => setTimeout(resolve, delay));
-    }
-  }
 }
 
 export function stopWhatsAppClient () {
