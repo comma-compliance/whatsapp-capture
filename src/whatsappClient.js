@@ -87,6 +87,7 @@ export function initializeWhatsAppClient () {
     channel.speak({ message: 'Client is ready!' })
 
     const contacts = await client.getContacts() // https://docs.wwebjs.dev/Contact.html
+    console.log(`Total contacts: ${contacts.length}`);
 
     // get the avatar pic and include in payload - getProfilePicUrl()
     for (const contact of contacts) {
