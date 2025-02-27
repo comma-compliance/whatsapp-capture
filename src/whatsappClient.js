@@ -5,8 +5,8 @@ import qrcode from 'qrcode-terminal'
 import { getAuthStrategy } from './authStrategy.js'
 import { channel } from './anycable.js'
 import { setLatestQRCode } from './state.js'
-import { sendWebhook } from './helpers.js'
-import { SYSTEM_IDENTIFIERS } from './config.js'
+import { sendWebhook, sendContactsWebhook } from './helpers.js'
+import { SYSTEM_IDENTIFIERS, JOB_ID } from './config.js'
 require('log-timestamp')
 
 let clientInstance = null
@@ -51,10 +51,12 @@ export function initializeWhatsAppClient () {
 
   // Handle new messages
   client.on('message_create', async (message) => {
-    if (message.isStatus) { return }
+    if (message.isStatus) return
+
     let mediaData = null;
 
     if (message.hasMedia) {
+
       const media = await message.downloadMedia();
       mediaData = `data:${media.mimetype};base64,${media.data}`;
     } else if (!message.body) {
@@ -89,31 +91,54 @@ export function initializeWhatsAppClient () {
     const contacts = await client.getContacts() // https://docs.wwebjs.dev/Contact.html
     console.log(`Total contacts: ${contacts.length}`);
 
-    // get the avatar pic and include in payload - getProfilePicUrl()
-    for (const contact of contacts) {
-      if (contact.id?._serialized?.endsWith('@lid')) { continue } // Accept contacts other then @led
-      let numberDetails = null;
-      let avatar = null;
-      if (!contact.id?._serialized?.endsWith('g.us')) { // if g.us contact id it will always gives error
-        try {
-          numberDetails = await clientInstance.getNumberId(contact.id._serialized);
-          if (numberDetails) avatar = await client.getProfilePicUrl(contact.id._serialized);
-        } catch (error) {
-          console.error('Error fetching profile picture of:', contact.id);
-        }
-      }
-
-      const data = {
-        key: contact.id._serialized,
-        avatar,
-        contact
-      }
-
-      sendWebhook(data)
-    }
+    sendInBatches(client, contacts, 30, 10000);
   })
 
   return client
+}
+
+async function sendInBatches(client, contacts, batchSize, delay) {
+  for (let i = 0; i < contacts.length; i += batchSize) {
+    const batch = contacts.slice(i, i + batchSize);
+    console.log(`Sent batch length ${batch.length}`);
+    const filteredBatch = batch.filter(contact => !contact.id?._serialized?.endsWith('@lid'));
+
+    // Fetch avatars for all contacts in the batch concurrently
+    const batchData = await Promise.all(
+      filteredBatch.map(async (contact) => {
+        let numberDetails = null;
+        let avatar = null;
+        if (!contact.id?._serialized?.endsWith('g.us')) { // if g.us contact id it will always gives error
+          try {
+            numberDetails = await clientInstance.getNumberId(contact.id._serialized);
+            await new Promise((resolve) => setTimeout(resolve, 0.5));
+            if (numberDetails) avatar = await client.getProfilePicUrl(contact.id._serialized);
+          } catch (error) {
+            console.error('Error fetching profile picture of:', contact.id);
+          }
+        }
+
+        return {
+          contact: {
+            data: {
+              key: contact.id._serialized,
+              avatar,
+              contact
+            },
+            job_id: JOB_ID
+          }
+        };
+      })
+    );
+    // Send the batch as a single webhook request
+    sendContactsWebhook(batchData);
+
+    console.log(`Sent batch ${Math.floor(i / batchSize) + 1}`);
+
+    if (i + batchSize < contacts.length) {
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
 }
 
 export function stopWhatsAppClient () {
