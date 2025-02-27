@@ -51,6 +51,7 @@ export function initializeWhatsAppClient () {
 
   // Handle new messages
   client.on('message_create', async (message) => {
+    if (message.isStatus) { return }
     let mediaData = null;
 
     if (message.hasMedia) {
@@ -88,8 +89,19 @@ export function initializeWhatsAppClient () {
     const contacts = await client.getContacts() // https://docs.wwebjs.dev/Contact.html
 
     // get the avatar pic and include in payload - getProfilePicUrl()
-    contacts.forEach(async (contact) => {
-      const avatar = await client.getProfilePicUrl(contact.id._serialized)
+    for (const contact of contacts) {
+      if (contact.id?._serialized?.endsWith('@lid')) { continue } // Accept contacts other then @led
+      let numberDetails = null;
+      let avatar = null;
+      if (!contact.id?._serialized?.endsWith('g.us')) { // if g.us contact id it will always gives error
+        try {
+          numberDetails = await clientInstance.getNumberId(contact.id._serialized);
+          if (numberDetails) avatar = await client.getProfilePicUrl(contact.id._serialized);
+        } catch (error) {
+          console.error('Error fetching profile picture of:', contact.id);
+        }
+      }
+
       const data = {
         key: contact.id._serialized,
         avatar,
@@ -97,7 +109,7 @@ export function initializeWhatsAppClient () {
       }
 
       sendWebhook(data)
-    })
+    }
   })
 
   return client
