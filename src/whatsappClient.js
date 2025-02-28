@@ -130,8 +130,14 @@ async function sendInBatches(client, contacts, batchSize, delay) {
         };
       })
     );
-    // Send the batch as a single webhook request
-    sendContactsWebhook(batchData);
+    // **Remove null/undefined values before sending**
+    const filteredBatchData = batchData.filter(Boolean); // Removes all falsy values
+
+    if (filteredBatchData.length > 0) {
+      sendContactsWebhook(filteredBatchData);
+    } else {
+      console.log("Skipping webhook: No valid contacts to send.");
+    }
 
     console.log(`Sent batch ${Math.floor(i / batchSize) + 1}`);
 
