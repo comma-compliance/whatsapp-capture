@@ -22,6 +22,6 @@ export const sendContactsWebhook = async (data) => {
     body: JSON.stringify({ job_id: JOB_ID, bulk_contacts: true, data })
   })
     .then((res) => res.text())
-    .then((text) => console.log('Contact sent to webhook:', data.key, text))
+    .then((text) => console.log('Contacts sent to webhook:', text))
     .catch((err) => console.error('Error sending contact to webhook:', err))
 }

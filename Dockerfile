@@ -32,4 +32,4 @@ RUN chown -R chrome:chrome /data
 USER chrome
 
 # Start the application
-CMD ["node", "index.js"]
+CMD ["node", "--expose-gc", "index.js"]

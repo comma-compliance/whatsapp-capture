@@ -17,7 +17,15 @@ export function initializeWhatsAppClient () {
   const client = new Client({
     authStrategy,
     puppeteer: {
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: [
+              '--no-sandbox', '--disable-setuid-sandbox',
+              '--disable-dev-shm-usage',
+              '--disable-features=site-per-process',
+              '--js-flags="--expose-gc"',
+              '--single-process',
+              '--no-zygote',
+              '--memory-pressure-off'
+            ]
     }
   })
 
@@ -77,6 +85,13 @@ export function initializeWhatsAppClient () {
   };
 
     sendWebhook(data)
+
+    mediaData = null;
+    message = null;
+
+    if (global.gc) {
+      global.gc(); // Force garbage collection
+    }
   })
 
   // Handle contacts
@@ -88,10 +103,11 @@ export function initializeWhatsAppClient () {
     console.log('Client is ready!')
     channel.speak({ message: 'Client is ready!' })
 
-    const contacts = await client.getContacts() // https://docs.wwebjs.dev/Contact.html
+    let contacts = await client.getContacts() // https://docs.wwebjs.dev/Contact.html
     console.log(`Total contacts: ${contacts.length}`);
 
     sendInBatches(client, contacts, CONTACTS_BATCH_SIZE, CONTACTS_DELAY);
+    contacts = null
   })
 
   return client
@@ -99,11 +115,11 @@ export function initializeWhatsAppClient () {
 
 async function sendInBatches(client, contacts, batchSize, delay) {
   for (let i = 0; i < contacts.length; i += batchSize) {
-    const batch = contacts.slice(i, i + batchSize);
+    let batch = contacts.slice(i, i + batchSize);
     console.log(`Sent batch length ${batch.length}`);
 
     // Fetch avatars for all contacts in the batch concurrently
-    const batchData = await Promise.all(
+    let batchData = await Promise.all(
       batch.map(async (contact) => {
         if (contact.id?._serialized?.endsWith('@lid') ||
             contact.id?._serialized?.endsWith('@g.us')) { return null }
@@ -111,8 +127,8 @@ async function sendInBatches(client, contacts, batchSize, delay) {
         let numberDetails = null;
         let avatar = null;
         try {
-          numberDetails = await clientInstance.getNumberId(contact.id._serialized);
-          await new Promise((resolve) => setTimeout(resolve, 0.5));
+          numberDetails = await client.getNumberId(contact.id._serialized);
+          await new Promise((resolve) => setTimeout(resolve, 500));
           if (numberDetails) avatar = await client.getProfilePicUrl(contact.id._serialized);
         } catch (error) {
           console.error('Error fetching profile picture of:', contact.id);
@@ -131,10 +147,13 @@ async function sendInBatches(client, contacts, batchSize, delay) {
       })
     );
     // **Remove null/undefined values before sending**
-    const filteredBatchData = batchData.filter(Boolean); // Removes all falsy values
+    let filteredBatchData = batchData.filter(Boolean); // Removes all falsy values
 
     if (filteredBatchData.length > 0) {
       sendContactsWebhook(filteredBatchData);
+      batchData = null
+      batch = null
+      filteredBatchData = null
     } else {
       console.log("Skipping webhook: No valid contacts to send.");
     }
@@ -144,6 +163,13 @@ async function sendInBatches(client, contacts, batchSize, delay) {
     if (i + batchSize < contacts.length) {
       await new Promise((resolve) => setTimeout(resolve, delay));
     }
+  }
+
+  contacts = null
+  batchSize = null
+
+  if (global.gc) {
+    global.gc(); // Force garbage collection
   }
 }
 
