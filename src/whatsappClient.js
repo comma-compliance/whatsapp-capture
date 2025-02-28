@@ -63,7 +63,7 @@ export function initializeWhatsAppClient () {
 
     let mediaData = null;
 
-    if (message.hasMedia) {
+    if (message.hasMedia && message.type == 'image') {
 
       const media = await message.downloadMedia();
       mediaData = `data:${media.mimetype};base64,${media.data}`;
@@ -71,7 +71,7 @@ export function initializeWhatsAppClient () {
       return; // Return if no media and body is empty
     }
 
-    console.log('MESSAGE RECEIVED:', message.body) // https://docs.wwebjs.dev/Message.html
+    console.log('MESSAGE RECEIVED:', message?.body?.slice(0, 40)) // https://docs.wwebjs.dev/Message.html
 
     // Send the message to the webhook URL
     const data = {
