@@ -12,4 +12,6 @@ export const AWS_S3_BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME
 export const AWS_S3_REGION = process.env.AWS_S3_REGION
 export const AWS_S3_PREFIX = process.env.AWS_S3_PREFIX || 'whatsapp-sessions/'
 
-export const SYSTEM_IDENTIFIERS = process.env.SYSTEM_IDENTIFIERS.split(",") || ['14233840306']
+export const SYSTEM_IDENTIFIERS = process.env.SYSTEM_IDENTIFIERS?.split(",") || ['14233840306']
+export const CONTACTS_BATCH_SIZE = parseInt(process.env.CONTACTS_BATCH_SIZE, 10) || 50
+export const CONTACTS_DELAY = parseInt(process.env.CONTACTS_DELAY, 10) || 3000

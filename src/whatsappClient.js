@@ -6,7 +6,7 @@ import { getAuthStrategy } from './authStrategy.js'
 import { channel } from './anycable.js'
 import { setLatestQRCode } from './state.js'
 import { sendWebhook, sendContactsWebhook } from './helpers.js'
-import { SYSTEM_IDENTIFIERS, JOB_ID } from './config.js'
+import { SYSTEM_IDENTIFIERS, JOB_ID, CONTACTS_BATCH_SIZE, CONTACTS_DELAY } from './config.js'
 require('log-timestamp')
 
 let clientInstance = null
@@ -91,7 +91,7 @@ export function initializeWhatsAppClient () {
     const contacts = await client.getContacts() // https://docs.wwebjs.dev/Contact.html
     console.log(`Total contacts: ${contacts.length}`);
 
-    sendInBatches(client, contacts, 30, 10000);
+    sendInBatches(client, contacts, CONTACTS_BATCH_SIZE, CONTACTS_DELAY);
   })
 
   return client
@@ -101,21 +101,21 @@ async function sendInBatches(client, contacts, batchSize, delay) {
   for (let i = 0; i < contacts.length; i += batchSize) {
     const batch = contacts.slice(i, i + batchSize);
     console.log(`Sent batch length ${batch.length}`);
-    const filteredBatch = batch.filter(contact => !contact.id?._serialized?.endsWith('@lid'));
 
     // Fetch avatars for all contacts in the batch concurrently
     const batchData = await Promise.all(
-      filteredBatch.map(async (contact) => {
+      batch.map(async (contact) => {
+        if (contact.id?._serialized?.endsWith('@lid') ||
+            contact.id?._serialized?.endsWith('@g.us')) { return null }
+
         let numberDetails = null;
         let avatar = null;
-        if (!contact.id?._serialized?.endsWith('g.us')) { // if g.us contact id it will always gives error
-          try {
-            numberDetails = await clientInstance.getNumberId(contact.id._serialized);
-            await new Promise((resolve) => setTimeout(resolve, 0.5));
-            if (numberDetails) avatar = await client.getProfilePicUrl(contact.id._serialized);
-          } catch (error) {
-            console.error('Error fetching profile picture of:', contact.id);
-          }
+        try {
+          numberDetails = await clientInstance.getNumberId(contact.id._serialized);
+          await new Promise((resolve) => setTimeout(resolve, 0.5));
+          if (numberDetails) avatar = await client.getProfilePicUrl(contact.id._serialized);
+        } catch (error) {
+          console.error('Error fetching profile picture of:', contact.id);
         }
 
         return {
