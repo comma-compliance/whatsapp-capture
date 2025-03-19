@@ -62,7 +62,11 @@ export function initializeWhatsAppClient () {
     if (message.isStatus) return
 
     let mediaData = null;
-
+    if (message.from?.includes("@c.us")) {
+      const reciever_contact = await client.getContactById(message.to);
+      message.reciever_name = reciever_contact.name || reciever_contact.pushname
+      message.reciever_phone = reciever_contact.number
+    }
     if (message.hasMedia && message.type == 'image') {
 
       const media = await message.downloadMedia();
