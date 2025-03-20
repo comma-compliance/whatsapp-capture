@@ -41,7 +41,13 @@ channel.on('message', async (msg) => {
 })
 
 channel.on('typing', (msg) => console.log(`User ${JSON.stringify(msg)} is typing`))
-channel.on('close', () => console.log('close from WebSocket server'))
+
+channel.on('close', () => {
+  console.log('close from WebSocket server Retrying to connect....')
+  consumer.subscribe(channel)
+  consumer.connect()
+})
+
 channel.on('disconnect', () => console.log('disconnect from WebSocket connection'))
 
 // Connect the consumer
