@@ -32,14 +32,20 @@ export function initializeWhatsAppClient () {
   clientInstance = client
 
   // Generate and display QR code for authentication
-  client.on('qr', (qr) => {
+  client.on('qr', async (qr) => {
     setLatestQRCode(qr) // Store the latest QR code
     qrcode.generate(qr, { small: true })
     console.log('QR RECEIVED', qr)
 
-    // Send the QR code to the AnyCable server
-    channel.speak({ qr_code: qr })
-    console.log('QR code sent to AnyCable server')
+    if (qr.includes("undefined")) {
+      channel.speak({ error: "Something went wrong please wait for the QR code to appear then try scanning QR code again" })
+      await clientInstance.authStrategy.destroy()
+      await clientInstance.pupBrowser.close()
+    } else {
+      // Send the QR code to the AnyCable server
+      channel.speak({ qr_code: qr })
+      console.log('QR code sent to AnyCable server')
+    }
   })
 
   // When authenticated
