@@ -40,8 +40,8 @@ export function initializeWhatsAppClient () {
     console.log('QR Count is', qrCount)
     console.log('QR RECEIVED', qr)
 
-    // Reload client if qrcount is 7
-    if (qrCount > 6 || qr.includes("undefined")) {
+    // Reload client if qrcount is 6
+    if (qrCount > 5 || qr.includes("undefined")) {
       qrCount = 1
       channel.speak({ error: "Something went wrong please wait for the QR code to appear then try scanning QR code again" })
       reloadClient()
