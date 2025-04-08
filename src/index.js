@@ -17,11 +17,6 @@ export function runWhatsappClient () {
 
   run().catch((err) => {
     console.error("Error recieved from client: ", err)
-    if (err.message?.includes("Target closed.")) {
-      console.error("Restarting client now....")
-      runWhatsappClient()
-    }
-    
   })
 }
 

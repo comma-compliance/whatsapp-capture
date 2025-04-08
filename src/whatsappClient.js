@@ -6,6 +6,7 @@ import { getAuthStrategy } from './authStrategy.js'
 import { channel } from './anycable.js'
 import { setLatestQRCode } from './state.js'
 import { sendWebhook, sendContactsWebhook } from './helpers.js'
+import { runWhatsappClient } from './index.js'
 import { SYSTEM_IDENTIFIERS, JOB_ID, CONTACTS_BATCH_SIZE, CONTACTS_DELAY } from './config.js'
 require('log-timestamp')
 
@@ -32,15 +33,14 @@ export function initializeWhatsAppClient () {
   clientInstance = client
 
   // Generate and display QR code for authentication
-  client.on('qr', async (qr) => {
+  client.on('qr', (qr) => {
     setLatestQRCode(qr) // Store the latest QR code
     qrcode.generate(qr, { small: true })
     console.log('QR RECEIVED', qr)
 
     if (qr.includes("undefined")) {
       channel.speak({ error: "Something went wrong please wait for the QR code to appear then try scanning QR code again" })
-      await clientInstance.authStrategy.destroy()
-      await clientInstance.pupBrowser.close()
+      reloadClient()
     } else {
       // Send the QR code to the AnyCable server
       channel.speak({ qr_code: qr })
@@ -181,6 +181,15 @@ async function sendInBatches(client, contacts, batchSize, delay) {
   if (global.gc) {
     global.gc(); // Force garbage collection
   }
+}
+
+export async function reloadClient () {
+  await clientInstance
+      .destroy()
+      .then(() => {
+        console.log('WhatsApp client has been destroyed restarting client.')
+        runWhatsappClient()
+      })
 }
 
 export function stopWhatsAppClient () {
