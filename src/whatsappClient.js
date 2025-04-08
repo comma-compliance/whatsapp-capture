@@ -11,6 +11,7 @@ import { SYSTEM_IDENTIFIERS, JOB_ID, CONTACTS_BATCH_SIZE, CONTACTS_DELAY } from 
 require('log-timestamp')
 
 let clientInstance = null
+let qrCount = 1
 
 export function initializeWhatsAppClient () {
   const authStrategy = getAuthStrategy()
@@ -36,13 +37,17 @@ export function initializeWhatsAppClient () {
   client.on('qr', (qr) => {
     setLatestQRCode(qr) // Store the latest QR code
     qrcode.generate(qr, { small: true })
+    console.log('QR Count is', qrCount)
     console.log('QR RECEIVED', qr)
 
-    if (qr.includes("undefined")) {
+    // Reload client if qrcount is 7
+    if (qrCount > 6 || qr.includes("undefined")) {
+      qrCount = 1
       channel.speak({ error: "Something went wrong please wait for the QR code to appear then try scanning QR code again" })
       reloadClient()
     } else {
       // Send the QR code to the AnyCable server
+      qrCount = qrCount + 1
       channel.speak({ qr_code: qr })
       console.log('QR code sent to AnyCable server')
     }
