@@ -12,43 +12,65 @@ export const consumer = createCable(WEBSOCKET_URL, {
 
 console.log('Subscribing to the WebSocket server', WEBSOCKET_URL)
 
-export const channel = new ChatChannel({ room_id: JOB_ID })
-consumer.subscribe(channel)
+export let channel = null
 
-// Event handlers for AnyCable
-channel.on('connect', (msg) => console.log(`Connected to anycable ${JSON.stringify(msg)}`))
-
-channel.on('message', async (msg) => {
-  console.log('MESSAGE RECEIVED:', JSON.stringify(msg))
-  const data = typeof msg === 'string' ? JSON.parse(msg) : msg
-
-  if (data.type === 'disconnect') {
-    console.log('Disconnect message received. Shutting down WhatsApp client.')
-    stopWhatsAppClient()
-  } else if (data.type === 'request_qr_code' && latestQRCode) {
-    // Send the latest QR code as a response
-    channel.speak({ qr_code: latestQRCode })
-    console.log('QR code sent to the user')
-  } else if (data.type === 'outbound_message') {
-    // send the message via whatsapp to the specified phone number
-    console.log('Sending message:', data.message, 'to', data.phone_number)
-    const resp = await sendMessage(data.phone_number, data.message)
-
-    channel.speak({ message_sent: true, response: resp })
-  } else {
-    console.log(`${data.name || 'Server'}: ${data.text || JSON.stringify(data)}`)
-  }
-})
-
-channel.on('typing', (msg) => console.log(`User ${JSON.stringify(msg)} is typing`))
-
-channel.on('close', () => {
-  console.log('close from WebSocket server Retrying to connect....')
+export function setupChannel () {
+  channel = new ChatChannel({ room_id: JOB_ID })
   consumer.subscribe(channel)
-  consumer.connect()
-})
 
-channel.on('disconnect', () => console.log('disconnect from WebSocket connection'))
+  // Event handlers for AnyCable
+  channel.on('connect', (msg) => console.log(`Connected to anycable ${JSON.stringify(msg)}`))
 
-// Connect the consumer
-consumer.connect()
+  channel.on('message', async (msg) => {
+    console.log('MESSAGE RECEIVED:', JSON.stringify(msg))
+    const data = typeof msg === 'string' ? JSON.parse(msg) : msg
+
+    if (data.type === 'disconnect') {
+      console.log('Disconnect message received. Shutting down WhatsApp client.')
+      stopWhatsAppClient()
+    } else if (data.type === 'request_qr_code' && latestQRCode) {
+      // Send the latest QR code as a response
+      channel.speak({ qr_code: latestQRCode })
+      console.log('QR code sent to the user')
+    } else if (data.type === 'outbound_message') {
+      // send the message via whatsapp to the specified phone number
+      console.log('Sending message:', data.message, 'to', data.phone_number)
+      const resp = await sendMessage(data.phone_number, data.message)
+
+      channel.speak({ message_sent: true, response: resp })
+    } else {
+      console.log(`${data.name || 'Server'}: ${data.text || JSON.stringify(data)}`)
+    }
+  })
+
+  channel.on('typing', (msg) => console.log(`User ${JSON.stringify(msg)} is typing`))
+
+  channel.on('close', () => {
+    console.log('close from WebSocket server Retrying to connect....')
+    setTimeout(() => {
+      // Wait a bit before reconnecting to avoid rapid reconnection loops
+      setupConnection()
+    }, 1000)
+  })
+
+  channel.on('disconnect', () => console.log('disconnect from WebSocket connection'))
+}
+
+function setupConnection() {
+  try {
+    // Disconnect from any existing connection first
+    consumer.disconnect()
+
+    // Set up a new channel
+    setupChannel()
+
+    // Connect the consumer
+    consumer.connect()
+  } catch (error) {
+    console.error('Error during reconnection:', error)
+    // Try again after a delay
+    setTimeout(setupConnection, 5000)
+  }
+}
+
+setupConnection()
