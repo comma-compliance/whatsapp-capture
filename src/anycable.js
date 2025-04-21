@@ -32,6 +32,8 @@ export function setupChannel () {
       // Send the latest QR code as a response
       channel.speak({ qr_code: latestQRCode })
       console.log('QR code sent to the user')
+    } else if (data.type === 'channel_diconnect') {
+      channel.disconnect()
     } else if (data.type === 'outbound_message') {
       // send the message via whatsapp to the specified phone number
       console.log('Sending message:', data.message, 'to', data.phone_number)
