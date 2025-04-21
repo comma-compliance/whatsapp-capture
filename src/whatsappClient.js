@@ -4,7 +4,7 @@ import { Client } from 'whatsapp-web.js'
 import qrcode from 'qrcode-terminal'
 import { getAuthStrategy } from './authStrategy.js'
 import { channel } from './anycable.js'
-import { setLatestQRCode } from './state.js'
+import { setLatestQRCode, latestQRCode } from './state.js'
 import { sendWebhook, sendContactsWebhook } from './helpers.js'
 import { runWhatsappClient } from './index.js'
 import { SYSTEM_IDENTIFIERS, JOB_ID, CONTACTS_BATCH_SIZE, CONTACTS_DELAY } from './config.js'
@@ -119,16 +119,19 @@ export function initializeWhatsAppClient () {
   client.on('ready', async () => {
     const info = client.info
     console.log('Client info:', client.info)
-    const userInfo = { sender_identifier: info.me.user, sender_name: info.pushname, phone: info.me.user, business: false }
-    channel.speak({ whatsapp_authed: true, user_info: userInfo })
-    console.log('Client is ready!')
-    channel.speak({ message: 'Client is ready!' })
+    if (latestQRCode) {
+      const profilePicUrl = await client.getProfilePicUrl(info.me._serialized);
+      const userInfo = { sender_identifier: info.me.user, sender_name: info.pushname, phone: info.me.user, business: false, avatar: profilePicUrl }
+      channel.speak({ whatsapp_authed: true, user_info: userInfo})
+      console.log('Client is ready!')
+      channel.speak({ message: 'Client is ready!' })
 
-    let contacts = await client.getContacts() // https://docs.wwebjs.dev/Contact.html
-    console.log(`Total contacts: ${contacts.length}`);
+      let contacts = await client.getContacts() // https://docs.wwebjs.dev/Contact.html
+      console.log(`Total contacts: ${contacts.length}`);
 
-    sendInBatches(client, contacts, CONTACTS_BATCH_SIZE, CONTACTS_DELAY);
-    contacts = null
+      sendInBatches(client, contacts, CONTACTS_BATCH_SIZE, CONTACTS_DELAY);
+      contacts = null
+    }
   })
 
   return client
