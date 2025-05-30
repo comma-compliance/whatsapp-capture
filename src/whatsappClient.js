@@ -13,7 +13,7 @@ require('log-timestamp')
 let clientInstance = null
 let qrCount = 1
 
-export function initializeWhatsAppClient () {
+export function initializeWhatsAppClient (reauth = false) {
   const authStrategy = getAuthStrategy()
 
   const client = new Client({
@@ -125,11 +125,12 @@ export function initializeWhatsAppClient () {
       channel.speak({ whatsapp_authed: true, user_info: userInfo})
       console.log('Client is ready!')
       channel.speak({ message: 'Client is ready!' })
-
-      let contacts = await client.getContacts() // https://docs.wwebjs.dev/Contact.html
-      console.log(`Total contacts: ${contacts.length}`);
-
-      sendInBatches(client, contacts, CONTACTS_BATCH_SIZE, CONTACTS_DELAY);
+      let contacts
+      if (!reauth) {
+        contacts = await client.getContacts() // https://docs.wwebjs.dev/Contact.html
+        console.log(`Total contacts: ${contacts.length}`);
+        sendInBatches(client, contacts, CONTACTS_BATCH_SIZE, CONTACTS_DELAY);
+      }
       contacts = null
     }
   })
