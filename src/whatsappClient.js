@@ -122,11 +122,13 @@ export function initializeWhatsAppClient (reauth = false) {
     if (latestQRCode) {
       const profilePicUrl = await client.getProfilePicUrl(info.me._serialized);
       const userInfo = { sender_identifier: info.me.user, sender_name: info.pushname, phone: info.me.user, business: false, avatar: profilePicUrl }
-      channel.speak({ whatsapp_authed: true, user_info: userInfo})
       console.log('Client is ready!')
       channel.speak({ message: 'Client is ready!' })
       let contacts
-      if (!reauth) {
+      if (reauth) {
+        channel.send({ type: 'reauthenticate' , user_info: userInfo})
+      } else {
+        channel.speak({ whatsapp_authed: true, user_info: userInfo})
         contacts = await client.getContacts() // https://docs.wwebjs.dev/Contact.html
         console.log(`Total contacts: ${contacts.length}`);
         sendInBatches(client, contacts, CONTACTS_BATCH_SIZE, CONTACTS_DELAY);
@@ -203,7 +205,8 @@ export async function reloadClient () {
       .destroy()
       .then(() => {
         console.log('WhatsApp client has been destroyed restarting client.')
-        runWhatsappClient()
+        channel.speak({ reauthenticate: true});
+        runWhatsappClient(true)
       })
 }
 
@@ -239,4 +242,21 @@ export async function sendMessage (phoneNumber, message) {
   } else {
     console.log('No WhatsApp client instance to send message.')
   }
+}
+
+export async function wrongAccountScanned() {
+  if (!clientInstance) {
+    console.log("No client instance to destroy");
+    return;
+  }
+
+  try {
+    await clientInstance.logout();
+    console.log("WhatsApp client is logout.");
+  } catch (error) {
+    console.error("Error destroying WhatsApp client:", error);
+  }
+
+  clientInstance = null; // Clear the global ref to avoid confusion
+  runWhatsappClient(true)
 }
