@@ -213,7 +213,11 @@ export async function reloadClient () {
 export function stopWhatsAppClient () {
   if (clientInstance) {
     clientInstance
-      .destroy()
+      .logout()
+      .then(() => {
+        console.log('WhatsApp client has been logged out.')
+        return clientInstance.destroy()
+      })
       .then(() => {
         console.log('WhatsApp client has been stopped.')
         channel.send({ message: 'WhatsApp client has been stopped.', type: 'disconnected' })
