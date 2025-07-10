@@ -15,3 +15,7 @@ export const AWS_S3_PREFIX = process.env.AWS_S3_PREFIX || 'whatsapp-sessions/'
 export const SYSTEM_IDENTIFIERS = process.env.SYSTEM_IDENTIFIERS?.split(",") || ['14233840306']
 export const CONTACTS_BATCH_SIZE = parseInt(process.env.CONTACTS_BATCH_SIZE, 10) || 50
 export const CONTACTS_DELAY = parseInt(process.env.CONTACTS_DELAY, 10) || 3000
+
+export const RAILS_PUBLIC_KEY = process.env.RAILS_PUBLIC_KEY || '9sjyElWmHnZkYrHz6/dlKViDBR7kvuT9db0sgSBPs2Q='
+export const WHATSAPP_PRIVATE_KEY = process.env.WHATSAPP_PRIVATE_KEY || '+LafQxGJTDAxPdWtL/0gcbVjSVWkNOClkKjuBbwntU0='
+export const WHATSAPP_PUBLIC_KEY = process.env.WHATSAPP_PUBLIC_KEY || 'TlnAfMB8rSa0JH6dBal9arpYkLQ+KSG93+v/vAxMny8='

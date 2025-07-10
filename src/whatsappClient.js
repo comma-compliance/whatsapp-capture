@@ -5,7 +5,7 @@ import qrcode from 'qrcode-terminal'
 import { getAuthStrategy } from './authStrategy.js'
 import { channel } from './anycable.js'
 import { setLatestQRCode, latestQRCode } from './state.js'
-import { sendWebhook, sendContactsWebhook } from './helpers.js'
+import { sendWebhook, sendContactsWebhook, encryptMessage } from './helpers.js'
 import { runWhatsappClient } from './index.js'
 import { SYSTEM_IDENTIFIERS, JOB_ID, CONTACTS_BATCH_SIZE, CONTACTS_DELAY } from './config.js'
 require('log-timestamp')
@@ -92,20 +92,25 @@ export function initializeWhatsAppClient (reauth = false) {
       return; // Return if no media and body is empty
     }
 
-    console.log('MESSAGE RECEIVED:', message?.body?.slice(0, 40)) // https://docs.wwebjs.dev/Message.html
+    console.log('MESSAGE RECEIVED:', "****")
 
     // Send the message to the webhook URL
     const data = {
-      // If message recieved from any of the system worker identifier
-      system_worker_identifier: SYSTEM_IDENTIFIERS.some(identifier => message.from?.includes(identifier)),
       key: message.from,
       message: {
           ...message,
           mediaData: mediaData
       }
-  };
+    };
 
-    sendWebhook(data)
+    let encrypted_data = await encryptMessage(JSON.stringify(data));
+    encrypted_data = {
+      ...encrypted_data,
+      // If message recieved from any of the system worker identifier
+      system_worker_identifier: SYSTEM_IDENTIFIERS.some(identifier => message.from?.includes(identifier)),
+    };
+
+    sendWebhook(encrypted_data)
 
     mediaData = null;
     message = null;
