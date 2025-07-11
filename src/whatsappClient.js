@@ -167,14 +167,19 @@ async function sendInBatches(client, contacts, batchSize, delay) {
           console.error('Error fetching profile picture of:', contact.id);
         }
 
+        let contact_data = {
+          data: {
+            key: contact.id._serialized,
+            avatar,
+            contact
+          },
+          job_id: JOB_ID
+        }
+
+        let encrypted_contact = await encryptMessage(JSON.stringify(contact_data));
         return {
           contact: {
-            data: {
-              key: contact.id._serialized,
-              avatar,
-              contact
-            },
-            job_id: JOB_ID
+            data: encrypted_contact
           }
         };
       })

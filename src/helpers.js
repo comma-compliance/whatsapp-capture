@@ -21,7 +21,7 @@ export const sendContactsWebhook = async (data) => {
   fetch(WEBHOOK_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ job_id: JOB_ID, bulk_contacts: true, data })
+    body: JSON.stringify({ bulk_contacts: true, data })
   })
     .then((res) => res.text())
     .then((text) => console.log('Contacts sent to webhook:', text))
