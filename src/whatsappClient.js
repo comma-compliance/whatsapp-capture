@@ -124,7 +124,6 @@ export function initializeWhatsAppClient (reauth = false) {
   // Handle contacts
   client.on('ready', async () => {
     const info = client.info
-    console.log('Client info:', client.info)
     if (latestQRCode) {
       const profilePicUrl = await client.getProfilePicUrl(info.me._serialized);
       const userInfo = { sender_identifier: info.me.user, sender_name: info.pushname, phone: info.me.user, business: false, avatar: profilePicUrl }

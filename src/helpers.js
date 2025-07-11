@@ -40,3 +40,15 @@ export const encryptMessage = async (message) =>  {
     whatsappPublicKey: WHATSAPP_PUBLIC_KEY
   };
 }
+
+export const decryptMessage = async (message) =>  {
+  const ciphertext = nacl.util.decodeBase64(message["ciphertext"]);
+  const nonce = nacl.util.decodeBase64(message["nonce"]);
+  const senderPublicKey = nacl.util.decodeBase64(message["rails_public_key"]);
+  const receiverPrivateKey = nacl.util.decodeBase64(WHATSAPP_PRIVATE_KEY);
+
+  const decrypted = nacl.box.open(ciphertext, nonce, senderPublicKey, receiverPrivateKey);
+
+  const payload = nacl.util.encodeUTF8(decrypted);
+  return JSON.parse(payload)
+}
