@@ -100,7 +100,8 @@ export function initializeWhatsAppClient (reauth = false) {
       message: {
           ...message,
           mediaData: mediaData
-      }
+      },
+      job_id: JOB_ID
     };
 
     let encrypted_data = await encryptMessage(JSON.stringify(data));
