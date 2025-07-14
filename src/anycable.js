@@ -4,7 +4,7 @@ import ChatChannel from './channels/chat.js'
 import WebSocket from 'ws'
 import { WEBSOCKET_URL, JOB_ID } from './config.js'
 import { latestQRCode } from './state.js'
-import { stopWhatsAppClient, sendMessage, wrongAccountScanned } from './whatsappClient.js'
+import { stopWhatsAppClient, sendMessage, wrongAccountScanned, fetchContacts } from './whatsappClient.js'
 import { encryptMessage, decryptMessage } from './helpers.js'
 
 export const consumer = createCable(WEBSOCKET_URL, {
@@ -45,6 +45,8 @@ export function setupChannel () {
     } else if (data.type === 'wrong_account_scanned') {
       console.log('Authuntication failed wrong credentials provided')
       wrongAccountScanned()
+    } else if (data.type === 'verification_message_received') {
+      fetchContacts()
     }
   })
 

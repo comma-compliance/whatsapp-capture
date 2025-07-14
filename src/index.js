@@ -3,10 +3,11 @@
 import './sentry.js'
 import { initializeWhatsAppClient } from './whatsappClient.js'
 import { channel } from './anycable.js'
+export const state = { reauth: false };
 
-export function runWhatsappClient (reauth = false) {
+export function runWhatsappClient () {
   // Initialize the WhatsApp client
-  const client = initializeWhatsAppClient(reauth)
+  const client = initializeWhatsAppClient()
 
   // Run the client
   const run = async () => {
@@ -23,7 +24,8 @@ export function runWhatsappClient (reauth = false) {
         await client.destroy();
         console.log("WhatsApp client is disconnected.");
         channel.speak({ reauthenticate: true});
-        runWhatsappClient(true);
+        state.reauth = true; 
+        runWhatsappClient();
       } catch (destroyErr) {
         console.error("Error destroying client:", destroyErr);
       }

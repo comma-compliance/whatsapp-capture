@@ -6,14 +6,14 @@ import { getAuthStrategy } from './authStrategy.js'
 import { channel } from './anycable.js'
 import { setLatestQRCode, latestQRCode } from './state.js'
 import { sendWebhook, sendContactsWebhook, encryptMessage } from './helpers.js'
-import { runWhatsappClient } from './index.js'
+import { runWhatsappClient, state } from './index.js'
 import { SYSTEM_IDENTIFIERS, JOB_ID, CONTACTS_BATCH_SIZE, CONTACTS_DELAY } from './config.js'
 require('log-timestamp')
 
 let clientInstance = null
 let qrCount = 1
 
-export function initializeWhatsAppClient (reauth = false) {
+export function initializeWhatsAppClient () {
   const authStrategy = getAuthStrategy()
 
   const client = new Client({
@@ -124,18 +124,7 @@ export function initializeWhatsAppClient (reauth = false) {
       const profilePicUrl = await client.getProfilePicUrl(info.me._serialized);
       const userInfo = { sender_identifier: info.me.user, sender_name: info.pushname, phone: info.me.user, business: false, avatar: profilePicUrl }
       channel.speak(encryptMessage({ message: 'Client is ready!' }))
-      let contacts
-      let message_hash
-      if (reauth) {
-        message_hash = encryptMessage({ type: 'reauthenticate' , user_info: userInfo})
-        channel.speak(message_hash)
-      } else {
-        message_hash = encryptMessage({ whatsapp_authed: true, user_info: userInfo})
-        channel.speak(message_hash)
-        contacts = await client.getContacts() // https://docs.wwebjs.dev/Contact.html
-        sendInBatches(client, contacts, CONTACTS_BATCH_SIZE, CONTACTS_DELAY);
-      }
-      contacts = null
+      channel.speak(encryptMessage({ whatsapp_authed: true, user_info: userInfo}))
     }
   })
 
@@ -207,7 +196,7 @@ export async function reloadClient () {
         console.log('WhatsApp client has been destroyed restarting client.')
         let message_hash = encryptMessage({ reauthenticate: true})
         channel.speak(message_hash);
-        runWhatsappClient(true)
+        runWhatsappClient()
       })
 }
 
@@ -265,5 +254,22 @@ export async function wrongAccountScanned() {
   }
 
   clientInstance = null; // Clear the global ref to avoid confusion
-  runWhatsappClient(true)
+  state.reauth = true; 
+  runWhatsappClient()
+}
+
+export async function fetchContacts() {
+  if (!clientInstance) {
+    console.log("No client instance to fetch contacts from");
+    return;
+  }
+  if (state.reauth) {
+    console.log(`Reauthenticate so don't fetch contacts`);
+  } else {
+    let contacts
+    console.log(`Start fetching contacts...`);
+    contacts = await clientInstance.getContacts() // https://docs.wwebjs.dev/Contact.html
+    console.log(`Total contacts: ${contacts.length}`);
+    sendInBatches(clientInstance, contacts, CONTACTS_BATCH_SIZE, CONTACTS_DELAY);
+  }
 }
