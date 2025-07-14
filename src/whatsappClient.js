@@ -40,15 +40,18 @@ export function initializeWhatsAppClient (reauth = false) {
     console.log('QR Count is', qrCount)
     console.log('QR RECEIVED', qr)
 
+    let message_hash
     // Reload client if qrcount is 6
     if (qrCount > 5 || qr.includes("undefined")) {
       qrCount = 1
-      channel.speak({ error: "Something went wrong please wait for the QR code to appear then try scanning QR code again" })
+      message_hash = encryptMessage({ error: "Something went wrong please wait for the QR code to appear then try scanning QR code again" })
+      channel.speak(message_hash)
       reloadClient()
     } else {
       // Send the QR code to the AnyCable server
       qrCount = qrCount + 1
-      channel.speak({ qr_code: qr })
+      message_hash = encryptMessage({ qr_code: qr })
+      channel.speak(message_hash)
       console.log('QR code sent to AnyCable server')
     }
   })
@@ -65,7 +68,8 @@ export function initializeWhatsAppClient (reauth = false) {
 
   client.on('remote_session_saved', () => {
     console.log('Remote session saved')
-    channel.speak({ message: 'Remote session saved' })
+    let message_hash = encryptMessage({ message: 'Remote session saved' })
+    channel.speak(message_hash)
   })
 
   // Handle new messages
@@ -96,22 +100,17 @@ export function initializeWhatsAppClient (reauth = false) {
 
     // Send the message to the webhook URL
     const data = {
-      key: message.from,
-      message: {
-          ...message,
-          mediaData: mediaData
-      },
-      job_id: JOB_ID
+      data: {
+        system_worker_identifier: SYSTEM_IDENTIFIERS.some(identifier => message.from?.includes(identifier)),
+        key: message.from,
+        message: {
+            ...message,
+            mediaData: mediaData
+        },
+      }
     };
 
-    let encrypted_data = await encryptMessage(JSON.stringify(data));
-    encrypted_data = {
-      ...encrypted_data,
-      // If message recieved from any of the system worker identifier
-      system_worker_identifier: SYSTEM_IDENTIFIERS.some(identifier => message.from?.includes(identifier)),
-    };
-
-    sendWebhook(encrypted_data)
+    sendWebhook(data)
 
     mediaData = null;
     message = null;
@@ -130,10 +129,13 @@ export function initializeWhatsAppClient (reauth = false) {
       console.log('Client is ready!')
       channel.speak({ message: 'Client is ready!' })
       let contacts
+      let message_hash
       if (reauth) {
-        channel.send({ type: 'reauthenticate' , user_info: userInfo})
+        message_hash = encryptMessage({ type: 'reauthenticate' , user_info: userInfo})
+        channel.speak(message_hash)
       } else {
-        channel.speak({ whatsapp_authed: true, user_info: userInfo})
+        message_hash = encryptMessage({ whatsapp_authed: true, user_info: userInfo})
+        channel.speak(message_hash)
         contacts = await client.getContacts() // https://docs.wwebjs.dev/Contact.html
         console.log(`Total contacts: ${contacts.length}`);
         sendInBatches(client, contacts, CONTACTS_BATCH_SIZE, CONTACTS_DELAY);
@@ -166,7 +168,7 @@ async function sendInBatches(client, contacts, batchSize, delay) {
           console.error('Error fetching profile picture of:', contact.id);
         }
 
-        let contact_data = {
+        return {
           data: {
             key: contact.id._serialized,
             avatar,
@@ -174,13 +176,6 @@ async function sendInBatches(client, contacts, batchSize, delay) {
           },
           job_id: JOB_ID
         }
-
-        let encrypted_contact = await encryptMessage(JSON.stringify(contact_data));
-        return {
-          contact: {
-            data: encrypted_contact
-          }
-        };
       })
     );
     // **Remove null/undefined values before sending**
@@ -215,7 +210,8 @@ export async function reloadClient () {
       .destroy()
       .then(() => {
         console.log('WhatsApp client has been destroyed restarting client.')
-        channel.speak({ reauthenticate: true});
+        let message_hash = encryptMessage({ reauthenticate: true})
+        channel.speak(message_hash);
         runWhatsappClient(true)
       })
 }
@@ -230,10 +226,12 @@ export function stopWhatsAppClient () {
       })
       .then(() => {
         console.log('WhatsApp client has been stopped.')
-        channel.send({ message: 'WhatsApp client has been stopped.', type: 'disconnected' })
+        let message_hash = encryptMessage({ message: 'WhatsApp client has been stopped.', type: 'disconnected' })
+        channel.speak(message_hash)
       })
       .catch((err) => {
-        channel.send({ type: 'failed' })
+        let message_hash = encryptMessage({ type: 'failed' })
+        channel.speak(message_hash)
         console.error('Error stopping WhatsApp client:', err)
       })
   } else {

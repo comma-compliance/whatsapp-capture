@@ -5,7 +5,7 @@ import WebSocket from 'ws'
 import { WEBSOCKET_URL, JOB_ID } from './config.js'
 import { latestQRCode } from './state.js'
 import { stopWhatsAppClient, sendMessage, wrongAccountScanned } from './whatsappClient.js'
-import { decryptMessage } from './helpers.js'
+import { encryptMessage, decryptMessage } from './helpers.js'
 
 export const consumer = createCable(WEBSOCKET_URL, {
   websocketImplementation: WebSocket
@@ -23,7 +23,8 @@ export function setupChannel () {
   channel.on('connect', (msg) => console.log(`Connected to anycable ${JSON.stringify(msg)}`))
 
   channel.on('message', async (msg) => {
-    console.log('MESSAGE RECEIVED:', JSON.stringify(msg))
+    msg = msg.nonce ? decryptMessage(msg) : msg;
+    console.log('MESSAGE RECEIVED:', "****")
     const data = typeof msg === 'string' ? JSON.parse(msg) : msg
 
     if (data.type === 'disconnect') {
@@ -31,15 +32,14 @@ export function setupChannel () {
       stopWhatsAppClient()
     } else if (data.type === 'request_qr_code' && latestQRCode) {
       // Send the latest QR code as a response
-      channel.speak({ qr_code: latestQRCode })
+      channel.speak(encryptMessage({ qr_code: latestQRCode }))
       console.log('QR code sent to the user')
     } else if (data.type === 'channel_diconnect') {
       channel.disconnect()
     } else if (data.type === 'outbound_message') {
-      const payload = await decryptMessage(data.info)
       // send the message via whatsapp to the specified phone number
       console.log('Sending message:', "****")
-      const resp = await sendMessage(payload.phone_number, payload.message)
+      const resp = await sendMessage(data.info.phone_number, data.info.message)
 
       channel.speak({ message_sent: true, response: resp })
     } else if (data.type === 'wrong_account_scanned') {
