@@ -126,8 +126,7 @@ export function initializeWhatsAppClient (reauth = false) {
     if (latestQRCode) {
       const profilePicUrl = await client.getProfilePicUrl(info.me._serialized);
       const userInfo = { sender_identifier: info.me.user, sender_name: info.pushname, phone: info.me.user, business: false, avatar: profilePicUrl }
-      console.log('Client is ready!')
-      channel.speak({ message: 'Client is ready!' })
+      channel.speak(encryptMessage({ message: 'Client is ready!' }))
       let contacts
       let message_hash
       if (reauth) {
