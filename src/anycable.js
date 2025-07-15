@@ -11,7 +11,7 @@ export const consumer = createCable(WEBSOCKET_URL, {
   websocketImplementation: WebSocket
 })
 
-console.log('Subscribing to the WebSocket server', WEBSOCKET_URL)
+console.log('Subscribing to the WebSocket server')
 
 export let channel = null
 
