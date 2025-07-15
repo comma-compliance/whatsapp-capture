@@ -5,8 +5,7 @@ import { JOB_ID } from './config.js'
 import { initializeWhatsAppClient } from './whatsappClient.js'
 import { channel } from './anycable.js'
 
-console.log('JOB_ID:', JOB_ID)
-export function runWhatsappClient (reauth = false) {
+export function runWhatsappClient () {
   // Initialize the WhatsApp client
   const client = initializeWhatsAppClient(reauth)
 
