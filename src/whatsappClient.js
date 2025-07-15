@@ -36,9 +36,6 @@ export function initializeWhatsAppClient (reauth = false) {
   // Generate and display QR code for authentication
   client.on('qr', (qr) => {
     setLatestQRCode(qr) // Store the latest QR code
-    qrcode.generate(qr, { small: true })
-    console.log('QR Count is', qrCount)
-    console.log('QR RECEIVED', qr)
 
     let message_hash
     // Reload client if qrcount is 6

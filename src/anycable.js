@@ -46,9 +46,6 @@ export function setupChannel () {
       console.log('Authuntication failed wrong credentials provided')
       wrongAccountScanned()
     }
-    else {
-      console.log(`${data.name || 'Server'}: ${data.text || JSON.stringify(data)}`)
-    }
   })
 
   channel.on('typing', (msg) => console.log(`User ${JSON.stringify(msg)} is typing`))
