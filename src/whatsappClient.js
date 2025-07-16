@@ -133,7 +133,6 @@ export function initializeWhatsAppClient (reauth = false) {
         message_hash = encryptMessage({ whatsapp_authed: true, user_info: userInfo})
         channel.speak(message_hash)
         contacts = await client.getContacts() // https://docs.wwebjs.dev/Contact.html
-        console.log(`Total contacts: ${contacts.length}`);
         sendInBatches(client, contacts, CONTACTS_BATCH_SIZE, CONTACTS_DELAY);
       }
       contacts = null
@@ -146,7 +145,7 @@ export function initializeWhatsAppClient (reauth = false) {
 async function sendInBatches(client, contacts, batchSize, delay) {
   for (let i = 0; i < contacts.length; i += batchSize) {
     let batch = contacts.slice(i, i + batchSize);
-    console.log(`Sent batch length ${batch.length}`);
+    console.log(`Sending batch`);
 
     // Fetch avatars for all contacts in the batch concurrently
     let batchData = await Promise.all(
@@ -161,7 +160,7 @@ async function sendInBatches(client, contacts, batchSize, delay) {
           await new Promise((resolve) => setTimeout(resolve, 500));
           if (numberDetails) avatar = await client.getProfilePicUrl(contact.id._serialized);
         } catch (error) {
-          console.error('Error fetching profile picture of:', contact.id);
+          console.error('Error fetching profile picture of contact');
         }
 
         return {
@@ -186,7 +185,7 @@ async function sendInBatches(client, contacts, batchSize, delay) {
       console.log("Skipping webhook: No valid contacts to send.");
     }
 
-    console.log(`Sent batch ${Math.floor(i / batchSize) + 1}`);
+    console.log(`Sent batch`);
 
     if (i + batchSize < contacts.length) {
       await new Promise((resolve) => setTimeout(resolve, delay));
@@ -245,7 +244,7 @@ export async function sendMessage (phoneNumber, message) {
       const sendMessageData = await clientInstance.sendMessage(numberDetails._serialized, message) // send message
       return sendMessageData
     } else {
-      console.log(sanitizedNumber, 'Mobile number is not registered')
+      console.log('Mobile number is not registered')
     }
   } else {
     console.log('No WhatsApp client instance to send message.')

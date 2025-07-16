@@ -16,7 +16,7 @@ export const sendWebhook = async (data) => {
     body: JSON.stringify({ data })
   })
     .then((res) => res.text())
-    .then((text) => console.log('Message sent to webhook:', data.nonce, text))
+    .then((text) => console.log('Message sent to webhook', text))
     .catch((err) => console.error('Error sending message to webhook:', err))
 }
 
