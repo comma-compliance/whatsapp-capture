@@ -1,11 +1,10 @@
 // index.js
 
 import './sentry.js'
-import { JOB_ID } from './config.js'
 import { initializeWhatsAppClient } from './whatsappClient.js'
 import { channel } from './anycable.js'
 
-export function runWhatsappClient () {
+export function runWhatsappClient (reauth = false) {
   // Initialize the WhatsApp client
   const client = initializeWhatsAppClient(reauth)
 
