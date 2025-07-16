@@ -60,6 +60,7 @@ export function initializeWhatsAppClient () {
 
   // When disconnected
   client.on('disconnected', () => {
+    state.reauth = true;
     console.log('DISCONNECTED')
   })
 
@@ -194,8 +195,7 @@ export async function reloadClient () {
       .destroy()
       .then(() => {
         console.log('WhatsApp client has been destroyed restarting client.')
-        let message_hash = encryptMessage({ reauthenticate: true})
-        channel.speak(message_hash);
+        channel.speak(encryptMessage({ reauthenticate: true}));
         runWhatsappClient()
       })
 }
