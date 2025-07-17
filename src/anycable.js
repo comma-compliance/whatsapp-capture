@@ -40,8 +40,6 @@ export function setupChannel () {
       // send the message via whatsapp to the specified phone number
       console.log('Sending message:', "****")
       const resp = await sendMessage(data.info.phone_number, data.info.message)
-
-      channel.speak({ message_sent: true, response: resp })
     } else if (data.type === 'wrong_account_scanned') {
       console.log('Authuntication failed wrong credentials provided')
       wrongAccountScanned()
