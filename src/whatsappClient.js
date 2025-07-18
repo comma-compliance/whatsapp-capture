@@ -80,6 +80,8 @@ export function initializeWhatsAppClient () {
       const chat = await client.getChatById(chat_id)
       message.participants = chat?.participants
       message.isGroup = true
+      let senderContact = await client.getContactById(message.author);
+      message.senderNumber = senderContact.number
     } else if (chat_id?.includes("@c.us")) {
       const reciever_contact = await client.getContactById(message.to);
       message.reciever_name = reciever_contact.name || reciever_contact.pushname
