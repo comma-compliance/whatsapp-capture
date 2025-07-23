@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import fetch from 'node-fetch'
-import { JOB_ID, RAILS_PUBLIC_KEY, WHATSAPP_PRIVATE_KEY, WHATSAPP_PUBLIC_KEY, WEBHOOK_URL } from './config.js'
+import { JOB_ID, APP_PUBLIC_KEY, WHATSAPP_PRIVATE_KEY, WHATSAPP_PUBLIC_KEY, WEBHOOK_URL } from './config.js'
 import nacl from 'tweetnacl';
 nacl.util = require('tweetnacl-util');
 
@@ -42,7 +42,7 @@ export const encryptMessage = (message) =>  {
   message = JSON.stringify(message)
   const nonce = nacl.randomBytes(nacl.box.nonceLength);
   const messageUint8 = nacl.util.decodeUTF8(message);
-  const appPublicKey = nacl.util.decodeBase64(RAILS_PUBLIC_KEY);
+  const appPublicKey = nacl.util.decodeBase64(APP_PUBLIC_KEY);
   const whatsappPrivateKey = nacl.util.decodeBase64(WHATSAPP_PRIVATE_KEY);
   const encrypted = nacl.box(messageUint8, nonce, appPublicKey, whatsappPrivateKey);
   return {
@@ -55,7 +55,7 @@ export const encryptMessage = (message) =>  {
 export const decryptMessage = (message) =>  {
   const ciphertext = nacl.util.decodeBase64(message["ciphertext"]);
   const nonce = nacl.util.decodeBase64(message["nonce"]);
-  const senderPublicKey = nacl.util.decodeBase64(message["rails_public_key"]);
+  const senderPublicKey = nacl.util.decodeBase64(message["app_public_key"]);
   const receiverPrivateKey = nacl.util.decodeBase64(WHATSAPP_PRIVATE_KEY);
 
   const decrypted = nacl.box.open(ciphertext, nonce, senderPublicKey, receiverPrivateKey);
