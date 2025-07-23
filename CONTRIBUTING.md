@@ -4,7 +4,7 @@ Thank you for your interest in contributing! To keep things smooth and secure, p
 
 ---
 
-## 🔐 1. Signed Commits Required
+## 1. Signed Commits Required
 
 All commits **must be signed** via GPG or SSH to comply with our CI's DCO check.
 
@@ -24,7 +24,7 @@ All commits **must be signed** via GPG or SSH to comply with our CI's DCO check.
 
 ---
 
-## 🐙 2. Creating a Pull Request
+## 2. Creating a Pull Request
 
 1. Fork the repo and create a branch (e.g., `feature/new-webhook`).
 2. Make changes: add features, tests, documentation updates.
@@ -36,7 +36,7 @@ All commits **must be signed** via GPG or SSH to comply with our CI's DCO check.
 
 ---
 
-## 📋 3. PR Checklist
+## 3. PR Checklist
 
 Before requesting review, confirm:
 
@@ -46,7 +46,7 @@ Before requesting review, confirm:
 
 ---
 
-## ✅ 4. Review Process
+## 4. Review Process
 
 - We require **at least two reviewer approvals** before merging.
 - Maintain a **clean, rebase-able history**—no merge commits.
@@ -61,7 +61,7 @@ We use a GitHub Actions workflow to enforce signed commits. Pull requests from u
 
 ---
 
-## 🎯 6. Additional Contributions
+## 6. Additional Contributions
 
 - **Bug reports**: open an issue, clearly state steps to reproduce and expected behavior.
 - **Feature requests**: suggest via issue, include usecase and any design notes.
