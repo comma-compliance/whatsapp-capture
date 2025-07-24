@@ -1,26 +1,59 @@
-# 🚀 Contributing to WhatsApp Connector
+# Contributing to WhatsApp Connector
+
+### 1. Development Workflow
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **Commit** your changes with signed commits
+4. **Push** to your branch (`git push origin feature/amazing-feature`)
+5. **Open** a Pull Request
 
 Thank you for your interest in contributing! To keep things smooth and secure, please follow these guidelines.
 
 ---
 
-## 1. Signed Commits Required
+## 2. Signed Commits Required
 
-All commits **must be signed** via GPG or SSH to comply with our CI's DCO check.
-
-- Add sign-off using:
+All commits **must be signed** via GPG to comply with our CI's DCO check.
+- Step 1: Generate a GPG key
+    ```bash
+    gpg --full-generate-key
+    ```
+- Step 2: List your GPG key ID
+    ```bash
+    gpg --list-secret-keys --keyid-format LONG
+    # Copy the long key ID e.g 9A1031CEDBC6E80778963E7A57F3B7F86D8B4D9F
+    ```
+- Step 3: Export your public GPG key
+    ```bash
+    gpg --armor --export 9A1031CEDBC6E80778963E7A57F3B7F86D8B4D9F
+    ```
+- Step 4: Add GPG key to GitHub
+    [Go to GitHub → Settings > SSH and GPG keys](https://github.com/settings/keys)
+    Click New GPG key
+    Paste the entire key block (from the step above)
+    Click Add GPG key
+- Step 5: Configure Git to use this key
+    ```bash
+    git config --global user.signingkey 9A1031CEDBC6E80778963E7A57F3B7F86D8B4D9F
+    git config --global commit.gpgsign true
+    git config --global user.name "Your Name"
+    git config --global user.email "your@email.com"
+    ```
+- Step 6: Make a signed commit
     ```bash
     git commit -S -m "feat: add new feature
-
-    Signed-off-by: Your Name <you@example.com>"
     ```
-
+- Step 7: Verify commit is signed
+    ```bash
+    git log --show-signature
+    gpg: Good signature from "Your Name <your@email.com>"
+    ```
 - Or use the shorthand:
     ```bash
     git commit -s -m "fix: correct typo"
     ```
 
-- A GitHub Action will automatically **verify signatures** on every push/PR.
+- We use a GitHub Actions workflow to enforce signed commits. Pull requests from unsigned commits will show a **"Signature check failed"** status.
 
 ---
 
@@ -36,28 +69,12 @@ All commits **must be signed** via GPG or SSH to comply with our CI's DCO check.
 
 ---
 
-## 3. PR Checklist
-
-Before requesting review, confirm:
-
-- [ ] ✅ Code builds & all tests pass locally
-- [ ] ✅ Commits are signed (check for “Verified” badge in GitHub)
-- [ ] 🧹 Code follows project style
-
----
-
 ## 4. Review Process
 
 - We require **at least two reviewer approvals** before merging.
-- Maintain a **clean, rebase-able history**—no merge commits.
+- Maintain a **clean, rebase-able history** no merge commits.
 - For large PRs or external changes, please open an issue first for discussion.
 - Avoid force-pushing after review; update appropriately, then squash and rebase.
-
----
-
-## ⚙️ 5. Commit Signing CI Enforcer
-
-We use a GitHub Actions workflow to enforce signed commits. Pull requests from unsigned commits will show a **"Signature check failed"** status.
 
 ---
 
@@ -69,4 +86,4 @@ We use a GitHub Actions workflow to enforce signed commits. Pull requests from u
 
 ---
 
-Thank you for helping us build a better tool! 🎉
+Thank you for helping us build a better tool!
