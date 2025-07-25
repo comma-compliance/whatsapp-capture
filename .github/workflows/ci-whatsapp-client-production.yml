@@ -1,0 +1,53 @@
+name: Build Whatsapp Prod
+
+# Trigger the workflow on push to main
+on:
+  push:
+    paths:
+      - 'whatsapp-client/**'
+      - '.github/workflows/ci-whatsapp-client-production.yml'
+    branches:
+      - main
+
+# Define environment variables
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/whatsapp-client
+  TAG: latest
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      # Step 1: Checkout the code from the repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Docker Buildx (necessary for multi-platform builds)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Step 3: Log in to GitHub Container Registry (GHCR)
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 4: Build the Docker image and tag it
+      - name: Build & Push Docker image
+        uses: docker/build-push-action@v6
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN_TCC_REPO }}
+          SENTRY_ORG: camphound
+          SENTRY_PROJECT: whatsapp-client
+        with:
+          push: true
+          tags: ${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          context: .
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
