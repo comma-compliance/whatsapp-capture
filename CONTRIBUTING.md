@@ -1,4 +1,4 @@
-# Contributing to WhatsApp Connector
+# Contributing to WhatsApp Capture
 
 ### 1. Development Workflow
 1. **Fork** the repository.
