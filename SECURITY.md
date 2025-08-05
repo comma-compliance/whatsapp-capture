@@ -48,4 +48,3 @@ We strongly recommend the following:
 - Monitor application and infrastructure logs for suspicious activity.
 - Keep all dependencies and images up to date.
 - Deploy in isolated and hardened network environments.
-
