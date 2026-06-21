@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@anycable/core": "^0.9.1",
-    "@aws-sdk/client-s3": "^3.693.0",
+    "@aws-sdk/client-s3": "^3.1073.0",
     "@sentry/node": "^8.38.0",
     "@sentry/profiling-node": "^8.38.0",
     "kafkajs": "^2.2.4",
@@ -17,7 +17,7 @@
     "qrcode-terminal": "^0.12.0",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
-    "uuid": "^11.0.3",
+    "uuid": "^14.0.1",
     "whatsapp-web.js": "^1.31.0",
     "ws": "^8.18.0",
     "wwebjs-aws-s3": "^1.0.2"
