@@ -1,0 +1,10 @@
+{
+  "$schema": "https://docs.oneleet.com/code-security/oneleetignore.schema.json",
+  "version": 1,
+  "ignores": [
+    {
+      "pathPatterns": ["/package-lock.json"],
+      "reason": "Accepted risk. Internal backend service not published to the npm registry. postinstall scripts are native Node.js addon build steps running in controlled CI with pinned dependency versions. All dependency changes require PR review and human approval."
+    }
+  ]
+}
