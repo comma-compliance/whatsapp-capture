@@ -36,7 +36,7 @@
     "picomatch": "^2.3.2",
     "minimatch": "3.1.5",
     "brace-expansion": "1.1.16",
-    "js-yaml": "^4.2.0",
+    "js-yaml": "^4.3.0",
     "@babel/core": "^7.29.6",
     "@opentelemetry/core": "^2.8.0",
     "@smithy/config-resolver": "^4.4.0",
