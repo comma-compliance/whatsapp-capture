@@ -42,7 +42,7 @@
     "@smithy/config-resolver": "^4.4.0",
     "readdir-glob": {
       "minimatch": "5.1.9",
-      "brace-expansion": "2.1.2"
+      "brace-expansion": "2.1.3"
     }
   },
   "standard": {
