@@ -43,7 +43,8 @@
     "readdir-glob": {
       "minimatch": "5.1.9",
       "brace-expansion": "2.1.4"
-    }
+    },
+    "browserslist": "^4.28.7"
   },
   "standard": {
     "env": [
