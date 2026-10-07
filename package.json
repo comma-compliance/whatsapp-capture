@@ -38,7 +38,12 @@
     "brace-expansion": "1.1.21",
     "js-yaml": "^4.3.2",
     "@babel/core": "^7.29.6",
-    "@opentelemetry/core": "^2.8.0",
+    "@opentelemetry/instrumentation-knex": "^0.65.0",
+    "@opentelemetry/instrumentation-mongoose": "^0.67.0",
+    "@opentelemetry/instrumentation-mysql": "^0.67.0",
+    "@opentelemetry/instrumentation-mysql2": "^0.67.0",
+    "@opentelemetry/instrumentation-pg": "^0.73.0",
+    "@opentelemetry/instrumentation-tedious": "^0.40.0",
     "@smithy/config-resolver": "^4.4.0",
     "readdir-glob": {
       "minimatch": "5.1.9",
