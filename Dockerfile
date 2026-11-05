@@ -11,7 +11,7 @@ USER chrome
 
 # Copy package.json and install dependencies
 COPY --chown=chrome:chrome package*.json ./
-RUN npm install
+RUN npm ci --omit=dev
 
 # Test stage
 # FROM base as test
